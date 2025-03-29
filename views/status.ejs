@@ -1,67 +1,99 @@
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0"><i class="fas fa-search me-2"></i>Check Application Status</h3>
-            </div>
-            <div class="card-body">
-                <p class="mb-4">Enter your information to check the current status of your voter ID application.</p>
-                
-                <% if (typeof error !== 'undefined') { %>
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle me-2"></i><%= error %>
-                    </div>
-                <% } %>
-                
-                <form action="/status" method="POST">
-                    <div class="mb-3">
-                        <label for="rid" class="form-label">RID (Registration ID)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                            <input type="text" class="form-control" id="rid" name="rid" placeholder="Enter your Registration ID (RID)" required value="<%= locals.rid || '' %>">
-                        </div>
-                        <small class="text-muted">Enter your Registration ID (RID) number</small>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="email" class="form-label">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required value="<%= locals.email || '' %>">
-                        </div>
-                        <small class="text-muted">Enter the email you provided during registration</small>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search me-2"></i>Check Status
-                        </button>
-                    </div>
-                </form>
-            </div>
+<div class="max-w-3xl mx-auto">
+    <!-- Status Check Card -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-primary-700 to-primary-900 px-6 py-5 text-white">
+            <h1 class="text-xl font-semibold flex items-center">
+                <i class="fas fa-search mr-3"></i>Check Application Status
+            </h1>
+            <p class="mt-2 text-primary-100 text-sm">Track your voter ID application and view its current processing stage</p>
         </div>
         
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Lost Your Registration Details?</h5>
-            </div>
-            <div class="card-body">
-                <p>If you don't have your registration information, you can:</p>
-                <ul>
-                    <li>Check your email for a confirmation message (if you provided an email)</li>
-                    <li>Visit our office in person with your national ID card</li>
-                    <li>Contact our support team at <a href="mailto:support@democracia-ec.gov">support@democracia-ec.gov</a></li>
-                </ul>
+        <div class="p-6">
+            <% if (typeof error !== 'undefined') { %>
+                <div class="mb-6 rounded-md bg-danger-50 p-4 border border-danger-200">
+                    <div class="flex">
+                        <i class="fas fa-exclamation-circle text-danger-500 mt-0.5 flex-shrink-0"></i>
+                        <div class="ml-3">
+                            <p class="text-danger-700"><%= error %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            
+            <form action="/status" method="POST" class="space-y-6">
+                <div>
+                    <label for="rid" class="form-label">Registration ID (RID)</label>
+                    <div class="relative mt-1 rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <i class="fas fa-id-card text-gray-400"></i>
+                        </div>
+                        <input type="text" id="rid" name="rid" 
+                            class="form-input pl-10" 
+                            placeholder="Enter your Registration ID (RID)" 
+                            required 
+                            value="<%= locals.rid || '' %>">
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Enter the Registration ID (RID) you received when applying</p>
+                </div>
                 
-                <div class="alert alert-info">
-                    <div class="d-flex">
-                        <div class="me-3">
-                            <i class="fas fa-info-circle fa-2x"></i>
+                <div>
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="relative mt-1 rounded-md shadow-sm">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <i class="fas fa-envelope text-gray-400"></i>
                         </div>
-                        <div>
-                            <strong>Need Help?</strong>
-                            <p class="mb-0">Our customer support center is available Monday through Friday, 9am to 5pm. Call us at +1-234-567-8901.</p>
-                        </div>
+                        <input type="email" id="email" name="email" 
+                            class="form-input pl-10" 
+                            placeholder="Enter your email address" 
+                            required 
+                            value="<%= locals.email || '' %>">
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">Enter the email address you provided during registration</p>
+                </div>
+                
+                <div>
+                    <button type="submit" class="w-full btn btn-primary py-2.5">
+                        <i class="fas fa-search mr-2"></i>Check Status
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Help Card -->
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-medium text-gray-900">Lost Your Registration Details?</h3>
+        </div>
+        
+        <div class="p-6">
+            <p class="text-gray-700 mb-4">If you don't have your registration information, you can:</p>
+            
+            <ul class="space-y-2 text-gray-700 mb-6">
+                <li class="flex items-start">
+                    <i class="fas fa-envelope text-primary-600 mt-1 mr-3"></i>
+                    <span>Check your email for a confirmation message (if you provided an email)</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-building text-primary-600 mt-1 mr-3"></i>
+                    <span>Visit our office in person with your national ID card</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-headset text-primary-600 mt-1 mr-3"></i>
+                    <span>Contact our support team at <a href="mailto:support@democracia-ec.gov" class="text-primary-600 hover:text-primary-500 underline">support@democracia-ec.gov</a></span>
+                </li>
+            </ul>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h4 class="text-blue-800 font-medium">Need Help?</h4>
+                        <p class="text-blue-700 text-sm mt-1">
+                            Our customer support center is available Monday through Friday, 9am to 5pm. Call us at +1-234-567-8901.
+                        </p>
                     </div>
                 </div>
             </div>

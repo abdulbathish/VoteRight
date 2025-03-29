@@ -7,3 +7,4 @@
 {"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:20:39.146Z"}
 {"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:27:39.695Z"}
 {"error":"listen EADDRINUSE: address already in use :::3000","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T22:14:33.276Z"}
+{"error":"listen EADDRINUSE: address already in use :::3000","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T22:33:40.835Z"}

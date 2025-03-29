@@ -1,33 +1,79 @@
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card border-danger mb-4">
-            <div class="card-header bg-danger text-white">
-                <h3 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Error</h3>
+<div class="max-w-3xl mx-auto">
+    <div class="card mb-8 border-2 border-danger-500 overflow-hidden">
+        <div class="bg-danger-600 px-6 py-5 text-white">
+            <h1 class="text-xl font-semibold flex items-center">
+                <i class="fas fa-exclamation-triangle mr-3"></i>Error Occurred
+            </h1>
+        </div>
+        
+        <div class="p-6">
+            <!-- Error Icon and Message -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-danger-100 text-danger-600 rounded-full mb-4">
+                    <i class="fas fa-exclamation-circle text-5xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-danger-700 mb-2">Something went wrong</h2>
+                <p class="text-lg text-danger-600"><%= message %></p>
             </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <i class="fas fa-exclamation-circle text-danger fa-5x mb-3"></i>
-                    <h4 class="text-danger">An error has occurred</h4>
-                    <p class="lead"><%= message %></p>
+            
+            <!-- What to do next -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-info-circle text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-blue-800 font-medium">What to do next?</h3>
+                        <p class="text-blue-700 mt-1 mb-2">You can try one of the following options:</p>
+                        <ul class="list-disc list-inside text-blue-700 space-y-1">
+                            <li>Return to the home page</li>
+                            <li>Contact our support team for assistance</li>
+                            <li>Check your application status if you've already applied</li>
+                        </ul>
+                    </div>
                 </div>
-                
-                <div class="alert alert-info">
-                    <h5><i class="fas fa-info-circle me-2"></i>What to do next?</h5>
-                    <p>You can try one of the following options:</p>
-                    <ul>
-                        <li>Return to the home page</li>
-                        <li>Contact our support team for assistance</li>
-                        <li>Check your application status if you've already applied</li>
-                    </ul>
+            </div>
+            
+            <!-- Navigation buttons -->
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-between sm:space-x-4 space-y-4 space-y-reverse sm:space-y-0">
+                <a href="/" class="btn btn-secondary">
+                    <i class="fas fa-home mr-2"></i>Return to Home
+                </a>
+                <a href="/status" class="btn btn-primary">
+                    <i class="fas fa-search mr-2"></i>Check Status
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Support Information -->
+    <div class="card">
+        <div class="card-header flex items-center">
+            <i class="fas fa-headset text-primary-600 mr-2"></i>
+            <h3 class="text-base font-medium text-gray-900">Need Help?</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-gray-700 mb-4">If you continue experiencing issues, please contact our support team:</p>
+            
+            <div class="flex items-center space-x-4 mb-2">
+                <div class="flex-shrink-0 w-10 flex justify-center">
+                    <i class="fas fa-envelope text-primary-600"></i>
                 </div>
-                
-                <div class="d-flex justify-content-between mt-4">
-                    <a href="/" class="btn btn-outline-primary">
-                        <i class="fas fa-home me-2"></i>Home
-                    </a>
-                    <a href="/status" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i>Check Status
-                    </a>
+                <div>
+                    <p class="text-gray-700">
+                        <a href="mailto:support@democracia-ec.gov" class="text-primary-600 hover:text-primary-500 underline">
+                            support@democracia-ec.gov
+                        </a>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0 w-10 flex justify-center">
+                    <i class="fas fa-phone text-primary-600"></i>
+                </div>
+                <div>
+                    <p class="text-gray-700">+1-234-567-8901</p>
                 </div>
             </div>
         </div>

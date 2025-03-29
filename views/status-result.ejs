@@ -1,111 +1,205 @@
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0"><i class="fas fa-search-plus me-2"></i>Application Status</h3>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <% if(voter.status === 'approved') { %>
-                        <div class="mb-3">
-                            <i class="fas fa-check-circle text-success fa-5x"></i>
-                        </div>
-                        <h4 class="text-success">Congratulations! Your application has been approved.</h4>
-                    <% } else if(voter.status === 'rejected') { %>
-                        <div class="mb-3">
-                            <i class="fas fa-times-circle text-danger fa-5x"></i>
-                        </div>
-                        <h4 class="text-danger">Unfortunately, your application has been rejected.</h4>
-                    <% } else { %>
-                        <div class="mb-3">
-                            <i class="fas fa-clock text-warning fa-5x"></i>
-                        </div>
-                        <h4 class="text-warning">Your application is currently under review.</h4>
-                    <% } %>
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-primary-700 to-primary-900 px-6 py-5 text-white">
+            <h1 class="text-xl font-semibold flex items-center">
+                <i class="fas fa-search-plus mr-3"></i>Application Status
+            </h1>
+        </div>
+        
+        <!-- Status Banner -->
+        <div class="p-6 text-center">
+            <% if(voter.status === 'approved') { %>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-success-100 text-success-600 rounded-full mb-4">
+                    <i class="fas fa-check-circle text-5xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-success-700 mb-2">Application Approved</h2>
+                <p class="text-success-600">Congratulations! Your voter ID application has been approved.</p>
+            <% } else if(voter.status === 'rejected') { %>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-danger-100 text-danger-600 rounded-full mb-4">
+                    <i class="fas fa-times-circle text-5xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-danger-700 mb-2">Application Rejected</h2>
+                <p class="text-danger-600">Unfortunately, your voter ID application has been rejected.</p>
+            <% } else { %>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-yellow-100 text-yellow-600 rounded-full mb-4">
+                    <i class="fas fa-clock text-5xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-yellow-700 mb-2">Application Pending</h2>
+                <p class="text-yellow-600">Your voter ID application is currently under review.</p>
+            <% } %>
+        </div>
+        
+        <!-- Application Timeline -->
+        <div class="px-6 pb-2">
+            <div class="flex items-center justify-between mx-4 mb-8">
+                <div class="relative flex flex-col items-center">
+                    <div class="rounded-full w-10 h-10 bg-primary-600 text-white flex items-center justify-center z-10">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <p class="text-sm mt-2 text-center">Submitted<br><span class="text-xs text-gray-500"><%= voter.createdAt.toLocaleDateString() %></span></p>
                 </div>
                 
-                <div class="card bg-light mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Application Details</h5>
-                        <table class="table table-bordered">
-                            <tr>
-                                <th style="width: 40%">Voter ID:</th>
-                                <td class="fw-bold"><span class="text-primary"><%= voter.id %></span></td>
-                            </tr>
-                            <tr>
-                                <th>RID (Registration ID):</th>
-                                <td class="fw-bold"><%= voter.registrationId %></td>
-                            </tr>
-                            <tr>
-                                <th>Name:</th>
-                                <td><%= voter.firstName %> <%= voter.lastName %></td>
-                            </tr>
-                            <tr>
-                                <th>Date of Birth:</th>
-                                <td><%= voter.dob %></td>
-                            </tr>
-                            <tr>
-                                <th>Application Date:</th>
-                                <td><%= voter.createdAt.toLocaleDateString() %></td>
-                            </tr>
-                            <tr>
-                                <th>Status:</th>
-                                <td>
-                                    <% if(voter.status === 'approved') { %>
-                                        <span class="badge bg-success">Approved</span>
-                                    <% } else if(voter.status === 'rejected') { %>
-                                        <span class="badge bg-danger">Rejected</span>
-                                    <% } else { %>
-                                        <span class="badge bg-warning text-dark">Pending Review</span>
-                                    <% } %>
-                                </td>
-                            </tr>
-                            <% if(voter.status === 'approved' && voter.approvedAt) { %>
-                            <tr>
-                                <th>Approval Date:</th>
-                                <td><%= voter.approvedAt.toLocaleDateString() %></td>
-                            </tr>
-                            <% } %>
-                            <% if(voter.status === 'rejected' && voter.rejectedAt) { %>
-                            <tr>
-                                <th>Rejection Date:</th>
-                                <td><%= voter.rejectedAt.toLocaleDateString() %></td>
-                            </tr>
-                            <% } %>
+                <div class="flex-1 h-0.5 bg-gray-200 relative">
+                    <div class="absolute inset-0 bg-primary-600 <%= voter.status === 'pending' ? 'w-1/2' : 'w-full' %>"></div>
+                </div>
+                
+                <div class="relative flex flex-col items-center">
+                    <div class="rounded-full w-10 h-10 <%= voter.status === 'pending' ? 'bg-gray-300 text-gray-500' : 'bg-primary-600 text-white' %> flex items-center justify-center z-10">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <p class="text-sm mt-2 text-center <%= voter.status === 'pending' ? 'text-gray-500' : '' %>">Reviewed<br>
+                        <% if(voter.status !== 'pending') { %>
+                            <span class="text-xs text-gray-500">
+                                <%= voter.status === 'approved' ? voter.approvedAt.toLocaleDateString() : voter.rejectedAt.toLocaleDateString() %>
+                            </span>
+                        <% } else { %>
+                            <span class="text-xs text-gray-400">Pending</span>
+                        <% } %>
+                    </p>
+                </div>
+                
+                <div class="flex-1 h-0.5 bg-gray-200 relative">
+                    <div class="absolute inset-0 bg-primary-600 <%= voter.status === 'approved' ? 'w-full' : 'w-0' %>"></div>
+                </div>
+                
+                <div class="relative flex flex-col items-center">
+                    <div class="rounded-full w-10 h-10 <%= voter.status === 'approved' ? 'bg-primary-600 text-white' : 'bg-gray-300 text-gray-500' %> flex items-center justify-center z-10">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <p class="text-sm mt-2 text-center <%= voter.status === 'approved' ? '' : 'text-gray-500' %>">ID Issued
+                        <% if(voter.status === 'approved') { %>
+                            <br><span class="text-xs text-gray-500"><%= voter.approvedAt.toLocaleDateString() %></span>
+                        <% } %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Application Details -->
+        <div class="px-6 pb-6">
+            <div class="card mb-6">
+                <div class="card-header flex items-center">
+                    <i class="fas fa-info-circle text-primary-600 mr-2"></i>
+                    <h3 class="text-base font-medium text-gray-900">Application Details</h3>
+                </div>
+                <div class="card-body px-0 pb-0">
+                    <div class="overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900 w-1/3">Voter ID</td>
+                                    <td class="py-3 px-3 text-sm font-semibold text-primary-700"><%= voter.id %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">RID (Registration ID)</td>
+                                    <td class="py-3 px-3 text-sm font-semibold text-gray-900"><%= voter.registrationId %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Name</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.firstName %> <%= voter.lastName %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Date of Birth</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.dob %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Application Date</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.createdAt.toLocaleDateString() %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Status</td>
+                                    <td class="py-3 px-3 text-sm">
+                                        <% if(voter.status === 'approved') { %>
+                                            <span class="inline-flex items-center rounded-full bg-success-100 px-2.5 py-0.5 text-xs font-medium text-success-800">
+                                                <i class="fas fa-check-circle mr-1"></i>Approved
+                                            </span>
+                                        <% } else if(voter.status === 'rejected') { %>
+                                            <span class="inline-flex items-center rounded-full bg-danger-100 px-2.5 py-0.5 text-xs font-medium text-danger-800">
+                                                <i class="fas fa-times-circle mr-1"></i>Rejected
+                                            </span>
+                                        <% } else { %>
+                                            <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                                                <i class="fas fa-clock mr-1"></i>Pending
+                                            </span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                                <% if(voter.status === 'approved' && voter.approvedAt) { %>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Approval Date</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.approvedAt.toLocaleDateString() %></td>
+                                </tr>
+                                <% } %>
+                                <% if(voter.status === 'rejected' && voter.rejectedAt) { %>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Rejection Date</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.rejectedAt.toLocaleDateString() %></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
                         </table>
                     </div>
                 </div>
-                
-                <% if(voter.status === 'approved') { %>
-                <div class="alert alert-success">
-                    <h5><i class="fas fa-id-card me-2"></i>Your Voter ID Card is Ready!</h5>
-                    <p>You can now download your digital voter ID card or visit our office to collect the physical card.</p>
-                    <div class="mt-3">
-                        <a href="/voter-card/<%= voter.id %>" class="btn btn-success" target="_blank">
-                            <i class="fas fa-download me-2"></i>Download Digital Voter ID
-                        </a>
+            </div>
+            
+            <!-- Status-specific message -->
+            <% if(voter.status === 'approved') { %>
+                <div class="bg-success-50 border border-success-200 rounded-lg p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-id-card text-success-600 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-success-800 font-medium">Your Voter ID Card is Ready!</h3>
+                            <p class="text-success-700 text-sm mt-1">
+                                You can now download your digital voter ID card or visit our office to collect the physical card.
+                            </p>
+                            <div class="mt-3">
+                                <a href="/voter-card/<%= voter.id %>" class="btn btn-success" target="_blank">
+                                    <i class="fas fa-download mr-2"></i>Download Digital Voter ID
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <% } else if(voter.status === 'rejected') { %>
-                <div class="alert alert-danger">
-                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Application Rejected</h5>
-                    <p>Your application has been rejected. Please visit our office with your national ID for more information.</p>
+            <% } else if(voter.status === 'rejected') { %>
+                <div class="bg-danger-50 border border-danger-200 rounded-lg p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-danger-600 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-danger-800 font-medium">Application Rejected</h3>
+                            <p class="text-danger-700 text-sm mt-1">
+                                Your application has been rejected. Please visit our office with your national ID for more information.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <% } else { %>
-                <div class="alert alert-warning">
-                    <h5><i class="fas fa-hourglass-half me-2"></i>Application in Process</h5>
-                    <p>Your application is currently being reviewed. This process typically takes 3-5 business days.</p>
+            <% } else { %>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-hourglass-half text-yellow-600 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-yellow-800 font-medium">Application in Process</h3>
+                            <p class="text-yellow-700 text-sm mt-1">
+                                Your application is currently being reviewed. This process typically takes 3-5 business days.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <% } %>
-                
-                <div class="d-flex justify-content-between mt-4">
-                    <a href="/status" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Status Check
-                    </a>
-                    <a href="/" class="btn btn-primary">
-                        <i class="fas fa-home me-2"></i>Return to Home
-                    </a>
-                </div>
+            <% } %>
+            
+            <!-- Navigation buttons -->
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-between sm:space-x-4 space-y-4 space-y-reverse sm:space-y-0">
+                <a href="/status" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Status Check
+                </a>
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home mr-2"></i>Return to Home
+                </a>
             </div>
         </div>
     </div>

@@ -1,79 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= typeof title !== 'undefined' ? title : 'Voter ID Card System - Democracia' %></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-id-card me-2"></i>
-                Democracia Voter ID System
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/apply"><i class="fas fa-edit me-1"></i> Apply</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/status"><i class="fas fa-search me-1"></i> Check Status</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/login"><i class="fas fa-user-shield me-1"></i> Admin</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mt-4 mb-5">
-        <%- body %>
-    </div>
-
-    <footer class="bg-dark text-white py-4 mt-auto">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Democracia Voter ID System</h5>
-                    <p>Official voter identification system for the fictitious country of Democracia.</p>
+<body class="h-full flex flex-col">
+    <header class="bg-white shadow">
+        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 justify-between">
+                <!-- Logo and brand -->
+                <div class="flex">
+                    <div class="flex flex-shrink-0 items-center">
+                        <a href="/" class="flex items-center space-x-2 text-primary-700 font-bold text-lg">
+                            <i class="fas fa-id-card text-xl"></i>
+                            <span>Democracia Voter ID</span>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/" class="text-white">Home</a></li>
-                        <li><a href="/apply" class="text-white">Apply for ID</a></li>
-                        <li><a href="/status" class="text-white">Check Status</a></li>
+
+                <!-- Desktop navigation -->
+                <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                    <a href="/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md">
+                        <i class="fas fa-home mr-1.5"></i>Home
+                    </a>
+                    <a href="/apply" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md">
+                        <i class="fas fa-edit mr-1.5"></i>Apply
+                    </a>
+                    <a href="/status" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md">
+                        <i class="fas fa-search mr-1.5"></i>Check Status
+                    </a>
+                    <a href="/admin/login" class="btn btn-primary ml-2">
+                        <i class="fas fa-user-shield mr-1.5"></i>Admin
+                    </a>
+                </div>
+
+                <!-- Mobile hamburger button -->
+                <div class="flex items-center sm:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars block h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile menu (hidden by default) -->
+            <div id="mobile-menu" class="sm:hidden hidden">
+                <div class="space-y-1 pb-3 pt-2">
+                    <a href="/" class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-700 rounded-md">
+                        <i class="fas fa-home mr-1.5"></i>Home
+                    </a>
+                    <a href="/apply" class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-700 rounded-md">
+                        <i class="fas fa-edit mr-1.5"></i>Apply
+                    </a>
+                    <a href="/status" class="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-700 rounded-md">
+                        <i class="fas fa-search mr-1.5"></i>Check Status
+                    </a>
+                    <a href="/admin/login" class="block px-3 py-2 text-base font-medium text-primary-700 rounded-md bg-primary-50">
+                        <i class="fas fa-user-shield mr-1.5"></i>Admin
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+            <%- body %>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <h2 class="text-lg font-semibold mb-4">Democracia Voter ID System</h2>
+                    <p class="text-gray-400 mb-4">Official voter identification system for the fictitious country of Democracia.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 hover:text-white">Home</a></li>
+                        <li><a href="/apply" class="text-gray-400 hover:text-white">Apply for ID</a></li>
+                        <li><a href="/status" class="text-gray-400 hover:text-white">Check Status</a></li>
+                        <li><a href="/admin/login" class="text-gray-400 hover:text-white">Admin Login</a></li>
                     </ul>
                 </div>
-                <div class="col-md-3">
-                    <h5>Contact</h5>
-                    <address class="mb-0">
-                        <p>Electoral Commission<br>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Contact</h3>
+                    <address class="text-gray-400 not-italic">
+                        Electoral Commission<br>
                         123 Democracy Avenue<br>
-                        Capital City, Democracia</p>
-                        <p>Email: info@democracia-ec.gov</p>
+                        Capital City, Democracia<br><br>
+                        <span class="block mt-2">Email: info@democracia-ec.gov</span>
                     </address>
                 </div>
             </div>
-            <hr>
-            <div class="text-center">
-                <p class="mb-0">&copy; <%= new Date().getFullYear() %> Democracia Electoral Commission. All rights reserved.</p>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; <%= new Date().getFullYear() %> Democracia Electoral Commission. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/main.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html> 
