@@ -1,0 +1,125 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-id-card me-2"></i>Your Voter ID Card</h2>
+                <div>
+                    <button id="printCard" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-print me-2"></i>Print Card
+                    </button>
+                    <button class="btn btn-outline-secondary copy-id" data-id="<%= voter.id %>">
+                        <i class="fas fa-copy me-2"></i>Copy ID
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card voter-id-card mb-5">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="d-flex align-items-center mb-4">
+                                <img src="/images/democracia-logo.png" alt="Democracia Electoral Commission Logo" style="max-width: 60px;" onerror="this.src='https://via.placeholder.com/60x60?text=EC'">
+                                <div class="ms-3">
+                                    <h4 class="m-0">DEMOCRACIA</h4>
+                                    <div>Electoral Commission</div>
+                                </div>
+                            </div>
+                            
+                            <h5 class="text-uppercase mb-4">Official Voter Identification Card</h5>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <div class="small text-uppercase fw-bold opacity-75">Full Name</div>
+                                    <div class="fs-5"><%= voter.firstName %> <%= voter.lastName %></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="small text-uppercase fw-bold opacity-75">Voter ID</div>
+                                    <div class="id-number"><%= voter.id %></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <div class="small text-uppercase fw-bold opacity-75">Date of Birth</div>
+                                    <div><%= new Date(voter.dob).toLocaleDateString() %></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="small text-uppercase fw-bold opacity-75">National ID</div>
+                                    <div><%= voter.idNumber %></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="small text-uppercase fw-bold opacity-75">Issue Date</div>
+                                    <div><%= voter.approvedAt.toLocaleDateString() %></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="small text-uppercase fw-bold opacity-75">Expiry Date</div>
+                                    <div><%= expiryDate.toLocaleDateString() %></div>
+                                </div>
+                            </div>
+                            
+                            <div class="small mt-2">
+                                <div class="small text-uppercase fw-bold opacity-75">Address</div>
+                                <div><%= voter.address %></div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 text-center">
+                            <div class="photo-area mb-3">
+                                <% if(voter.photoPath) { %>
+                                    <img src="/<%= voter.photoPath %>" alt="Voter Photo" class="img-fluid rounded">
+                                <% } else { %>
+                                    <img src="https://via.placeholder.com/150x200?text=PHOTO" alt="Placeholder" class="img-fluid rounded">
+                                <% } %>
+                            </div>
+                            
+                            <div class="qr-code bg-white p-2 d-inline-block rounded">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=<%= voter.id %>" alt="QR Code" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top border-light">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="small">This card is the property of the Democracia Electoral Commission. If found, please return to the nearest electoral office.</div>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <img src="/images/signature.png" alt="Official Signature" style="max-height: 40px;" onerror="this.src='https://via.placeholder.com/120x40?text=Signature'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Important Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>This voter ID card is official and valid for use in all elections in Democracia.</li>
+                        <li>You must present this card at your polling station to vote.</li>
+                        <li>The card is valid until the expiry date shown.</li>
+                        <li>Report lost or stolen cards immediately to the Electoral Commission.</li>
+                        <li>Tampering with or misuse of this card is a criminal offense.</li>
+                    </ul>
+                    
+                    <div class="alert alert-success">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <strong>Digital Card Security</strong>
+                                <p class="mb-0">Your digital voter ID card is protected with secure hash technology. Officials can verify its authenticity using the QR code or ID number.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,119 @@
+/* Main Styles for Voter ID System */
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Card Styles */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Jumbotron */
+.jumbotron {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Status Badges */
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Form Elements */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
+}
+
+/* ID Card Styles */
+.voter-id-card {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.voter-id-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('/images/coat-of-arms.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    opacity: 0.05;
+}
+
+.voter-id-card .photo-area {
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.voter-id-card .id-number {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Admin Dashboard */
+.admin-stats .card {
+    transition: all 0.3s ease;
+}
+
+.admin-stats .card:hover {
+    transform: translateY(-5px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .voter-id-card {
+        margin-bottom: 2rem;
+    }
+    
+    .jumbotron h1 {
+        font-size: 2rem;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+    }
+} 

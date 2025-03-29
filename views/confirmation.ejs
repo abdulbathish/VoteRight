@@ -1,0 +1,80 @@
+<div class="card border-success mb-4">
+    <div class="card-header bg-success text-white">
+        <h3 class="mb-0"><i class="fas fa-check-circle me-2"></i>Application Submitted Successfully</h3>
+    </div>
+    <div class="card-body">
+        <div class="text-center mb-4">
+            <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+            <h4>Thank you, <%= voter.firstName %> <%= voter.lastName %>!</h4>
+            <p class="lead">Your voter ID application has been received and is being processed.</p>
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>Important:</strong> Please save your Voter ID application number for future reference. You'll need this to check your application status.
+        </div>
+        
+        <div class="card bg-light mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Your Application Details</h5>
+                <table class="table table-bordered">
+                    <tr>
+                        <th style="width: 40%">Voter ID Application Number:</th>
+                        <td class="fw-bold"><span class="text-primary"><%= voter.id %></span></td>
+                    </tr>
+                    <tr>
+                        <th>Name:</th>
+                        <td><%= voter.firstName %> <%= voter.lastName %></td>
+                    </tr>
+                    <tr>
+                        <th>Date of Birth:</th>
+                        <td><%= voter.dob %></td>
+                    </tr>
+                    <tr>
+                        <th>Application Date:</th>
+                        <td><%= voter.createdAt.toLocaleDateString() %></td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            <span class="badge bg-warning text-dark">Pending Review</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <h5>What Happens Next?</h5>
+            <ol>
+                <li>Our electoral officials will review your application</li>
+                <li>Your information will be verified against our national database</li>
+                <li>Once approved, your voter ID will be ready for access</li>
+                <li>You can check your application status anytime using your application number</li>
+            </ol>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="/" class="btn btn-outline-primary">
+                <i class="fas fa-home me-2"></i>Return to Home
+            </a>
+            <a href="/status" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i>Check Application Status
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Additional Information</h5>
+    </div>
+    <div class="card-body">
+        <p>Thank you for applying for your Democracia Voter ID. Please note:</p>
+        <ul>
+            <li>Processing typically takes 3-5 business days</li>
+            <li>You'll receive a notification once your application is processed</li>
+            <li>For any inquiries, please contact our support team at <a href="mailto:support@democracia-ec.gov">support@democracia-ec.gov</a></li>
+            <li>This is an official document of the Democracia Electoral Commission</li>
+        </ul>
+    </div>
+</div> 

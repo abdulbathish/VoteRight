@@ -1,0 +1,9 @@
+{"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:05:20.399Z"}
+{"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:05:45.243Z"}
+{"error":"listen EADDRINUSE: address already in use :::3000","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:07:08.528Z"}
+{"error":"listen EADDRINUSE: address already in use :::3000","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:08:26.062Z"}
+{"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:10:26.297Z"}
+{"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:12:03.449Z"}
+{"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:20:39.146Z"}
+{"error":"listen EADDRINUSE: address already in use :::3001","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T21:27:39.695Z"}
+{"error":"listen EADDRINUSE: address already in use :::3000","level":"error","message":"Server error","service":"subsafe","timestamp":"2025-03-29T22:14:33.276Z"}

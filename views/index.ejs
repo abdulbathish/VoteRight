@@ -1,0 +1,103 @@
+<div class="jumbotron bg-light p-5 rounded">
+    <h1 class="display-4">Democracia Voter ID System</h1>
+    <p class="lead">The official platform for applying and managing voter identification in Democracia.</p>
+    <hr class="my-4">
+    <p>Every citizen of Democracia is entitled to vote in our democratic elections. Get your official voter ID today!</p>
+    <a class="btn btn-primary btn-lg" href="/apply" role="button">
+        <i class="fas fa-id-card me-2"></i>Apply for Voter ID
+    </a>
+    <a class="btn btn-outline-secondary btn-lg ms-2" href="/status" role="button">
+        <i class="fas fa-search me-2"></i>Check Application Status
+    </a>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-user-edit fa-3x text-primary mb-3"></i>
+                <h4 class="card-title">Apply Online</h4>
+                <p class="card-text">Complete your voter ID application entirely online with our streamlined process.</p>
+                <a href="/apply" class="btn btn-sm btn-primary">Start Application</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                <h4 class="card-title">Track Status</h4>
+                <p class="card-text">Check the status of your voter ID application anytime, anywhere.</p>
+                <a href="/status" class="btn btn-sm btn-primary">Check Status</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-id-card fa-3x text-primary mb-3"></i>
+                <h4 class="card-title">Digital Voter Card</h4>
+                <p class="card-text">Access your digital voter card once your application is approved.</p>
+                <a href="/status" class="btn btn-sm btn-primary">View My Card</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5">
+    <h2 class="mb-4">About The Democracia Voter ID System</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <p>The Democracia Voter ID System is the official platform for registering citizens to vote in our nation's elections. Our secure and efficient system ensures that:</p>
+            <ul>
+                <li>Every eligible citizen gets a unique voter identification</li>
+                <li>The electoral process remains transparent and secure</li>
+                <li>Citizens can easily apply for and manage their voter credentials</li>
+                <li>The integrity of our democratic process is maintained</li>
+            </ul>
+            <p>As mandated by the Electoral Act of Democracia, 
+            <% if (parseInt(process.env.MIN_VOTER_AGE) > 0) { %>
+                all citizens aged <%= process.env.MIN_VOTER_AGE %> and above are required to register
+            <% } else { %>
+                all citizens are eligible to register
+            <% } %>
+            in the national voter database to participate in elections.</p>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Why You Need a Voter ID</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="me-3 text-primary">
+                            <i class="fas fa-vote-yea fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6>Participate in Elections</h6>
+                            <p class="text-muted small">A voter ID is required to cast your ballot in local and national elections.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="me-3 text-primary">
+                            <i class="fas fa-shield-alt fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6>Prevent Fraud</h6>
+                            <p class="text-muted small">Secure identification helps prevent electoral fraud and maintains integrity.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-3 text-primary">
+                            <i class="fas fa-id-badge fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6>Official ID</h6>
+                            <p class="text-muted small">Your voter card can also serve as an official government identification.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
