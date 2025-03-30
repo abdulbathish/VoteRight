@@ -356,7 +356,61 @@ app.post('/admin/login', (req, res) => {
 });
 
 app.get('/admin/dashboard', isAdminLoggedIn, (req, res) => {
-  res.render('admin-dashboard', { voters: voterDatabase, title: 'Admin Dashboard - Democracia Electoral Commission' });
+  // Pagination parameters
+  const page = parseInt(req.query.page) || 1; // Current page (default: 1)
+  const limit = parseInt(req.query.limit) || 10; // Records per page (default: 10)
+  
+  // Filtering parameters
+  const statusFilter = req.query.status || 'all';
+  const searchQuery = req.query.search || '';
+  
+  // Apply filters to get filtered data
+  let filteredVoters = [...voterDatabase];
+  
+  // Apply status filter
+  if (statusFilter !== 'all') {
+    filteredVoters = filteredVoters.filter(voter => voter.status === statusFilter);
+  }
+  
+  // Apply search filter (case-insensitive search on first name, last name, and ID)
+  if (searchQuery) {
+    const searchLower = searchQuery.toLowerCase();
+    filteredVoters = filteredVoters.filter(voter => 
+      voter.firstName.toLowerCase().includes(searchLower) || 
+      voter.lastName.toLowerCase().includes(searchLower) || 
+      voter.id.toLowerCase().includes(searchLower) ||
+      (voter.idNumber && voter.idNumber.toLowerCase().includes(searchLower))
+    );
+  }
+  
+  // Calculate pagination
+  const totalRecords = filteredVoters.length;
+  const totalPages = Math.ceil(totalRecords / limit);
+  const skip = (page - 1) * limit; // Calculate records to skip
+  
+  // Get records for current page
+  const paginatedVoters = filteredVoters.slice(skip, skip + limit);
+  
+  res.render('admin-dashboard', { 
+    voters: paginatedVoters, 
+    totalVoters: voterDatabase.length,
+    totalApproved: voterDatabase.filter(voter => voter.status === 'approved').length,
+    totalPending: voterDatabase.filter(voter => voter.status === 'pending').length,
+    totalRejected: voterDatabase.filter(voter => voter.status === 'rejected').length,
+    filteredCount: filteredVoters.length,
+    filters: {
+      status: statusFilter,
+      search: searchQuery
+    },
+    pagination: {
+      page,
+      limit,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrev: page > 1
+    },
+    title: 'Admin Dashboard - Democracia Electoral Commission' 
+  });
 });
 
 // Individual voter details page

@@ -15,7 +15,7 @@
                         <i class="fas fa-file-alt text-blue-600 text-lg mr-2"></i>
                         <span class="text-gray-500 text-xs uppercase font-medium">TOTAL APPLICATIONS</span>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= voters.length %></h2>
+                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= totalVoters %></h2>
                 </div>
             </div>
             
@@ -26,7 +26,7 @@
                         <i class="fas fa-check-circle text-green-600 text-lg mr-2"></i>
                         <span class="text-gray-500 text-xs uppercase font-medium">APPROVED</span>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= voters.filter(voter => voter.status === 'approved').length %></h2>
+                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= totalApproved %></h2>
                 </div>
             </div>
             
@@ -37,7 +37,7 @@
                         <i class="fas fa-clock text-amber-600 text-lg mr-2"></i>
                         <span class="text-gray-500 text-xs uppercase font-medium">PENDING</span>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= voters.filter(voter => voter.status === 'pending').length %></h2>
+                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= totalPending %></h2>
                 </div>
             </div>
         </div>
@@ -53,10 +53,10 @@
                         <!-- Status Dropdown with Icon -->
                         <div class="relative">
                             <select id="statusFilter" class="appearance-none pl-10 pr-10 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors duration-200 shadow-sm hover:border-gray-300">
-                                <option value="all">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
+                                <option value="all" <%= filters && filters.status === 'all' ? 'selected' : '' %>>All Status</option>
+                                <option value="pending" <%= filters && filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="approved" <%= filters && filters.status === 'approved' ? 'selected' : '' %>>Approved</option>
+                                <option value="rejected" <%= filters && filters.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
                             </select>
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-filter text-gray-400"></i>
@@ -69,11 +69,12 @@
                         <!-- Improved Search Box with Clear Button -->
                         <div class="relative">
                             <input type="text" id="searchBox" placeholder="Search by name or ID" 
+                                   value="<%= filters && filters.search ? filters.search : '' %>"
                                    class="pl-10 pr-10 py-2 w-64 border border-gray-200 rounded-lg text-sm text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors duration-200 shadow-sm hover:border-gray-300" />
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
-                            <button id="clearSearch" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200 hidden">
+                            <button id="clearSearch" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200 <%= !filters || !filters.search ? 'hidden' : '' %>">
                                 <i class="fas fa-times text-sm"></i>
                             </button>
                         </div>
@@ -81,21 +82,23 @@
                 </div>
                 
                 <!-- Active Filters Section -->
-                <div id="activeFilters" class="px-6 pb-4 flex flex-wrap items-center gap-2 hidden">
+                <div id="activeFilters" class="px-6 pb-4 flex flex-wrap items-center gap-2 <%= (!filters || (filters.status === 'all' && !filters.search)) ? 'hidden' : '' %>">
                     <span class="text-sm font-medium text-gray-500">Active filters:</span>
                     <!-- Status filter badge (added dynamically) -->
-                    <div id="statusBadge" class="hidden px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full flex items-center">
+                    <div id="statusBadge" class="<%= (!filters || filters.status === 'all') ? 'hidden' : '' %> px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full flex items-center">
                         <i class="fas fa-filter text-blue-600 mr-2"></i>
-                        <span id="statusBadgeText">Status: All</span>
+                        <span id="statusBadgeText">Status: <%= filters && filters.status !== 'all' ? filters.status.charAt(0).toUpperCase() + filters.status.slice(1) : 'All' %></span>
                         <button class="ml-2 focus:outline-none hover:text-blue-800" id="clearStatusFilter">
                             <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
                     
                     <!-- Search filter badge (added dynamically) -->
-                    <div id="searchBadge" class="hidden px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full flex items-center">
+                    <div id="searchBadge" class="<%= (!filters || !filters.search) ? 'hidden' : '' %> px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full flex items-center">
                         <i class="fas fa-search text-blue-600 mr-2"></i>
-                        <span id="searchBadgeText">Search: </span>
+                        <span id="searchBadgeText" title="<%= filters && filters.search ? filters.search : '' %>">
+                            Search: <%= filters && filters.search ? (filters.search.length > 15 ? filters.search.substring(0, 15) + '...' : filters.search) : '' %>
+                        </span>
                         <button class="ml-2 focus:outline-none hover:text-blue-800" id="clearSearchFilter">
                             <i class="fas fa-times text-xs"></i>
                         </button>
@@ -201,6 +204,105 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination Controls -->
+                    <% if (pagination.totalPages > 1) { %>
+                        <div class="mt-6 px-4 flex items-center justify-between border-t border-gray-200 pt-6">
+                            <div class="text-sm text-gray-700">
+                                Showing <span class="font-medium"><%= (pagination.page - 1) * pagination.limit + 1 %></span> to 
+                                <span class="font-medium"><%= Math.min(pagination.page * pagination.limit, filteredCount) %></span> of 
+                                <span class="font-medium"><%= filteredCount %></span> applications
+                                <% if (filteredCount !== totalVoters) { %>
+                                    <span class="text-gray-500">(filtered from <%= totalVoters %> total)</span>
+                                <% } %>
+                            </div>
+                            <div class="flex space-x-1">
+                                <!-- Previous Page Button -->
+                                <% if (pagination.hasPrev) { %>
+                                    <a href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>" 
+                                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                        <i class="fas fa-chevron-left mr-1"></i>
+                                        Previous
+                                    </a>
+                                <% } else { %>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-md text-gray-400 bg-gray-50 cursor-not-allowed">
+                                        <i class="fas fa-chevron-left mr-1"></i>
+                                        Previous
+                                    </span>
+                                <% } %>
+                                
+                                <!-- Page Numbers -->
+                                <div class="hidden md:flex">
+                                    <% 
+                                    // Calculate range of page numbers to show
+                                    let startPage = Math.max(1, pagination.page - 2);
+                                    let endPage = Math.min(pagination.totalPages, pagination.page + 2);
+                                    
+                                    // Show first page if not in range
+                                    if (startPage > 1) { %>
+                                        <a href="?page=1&limit=<%= pagination.limit %>" 
+                                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                            1
+                                        </a>
+                                        <% if (startPage > 2) { %>
+                                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white">
+                                                ...
+                                            </span>
+                                        <% } %>
+                                    <% } %>
+                                    
+                                    <% for (let i = startPage; i <= endPage; i++) { %>
+                                        <% if (i === pagination.page) { %>
+                                            <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 text-sm font-medium rounded-md text-white bg-blue-600">
+                                                <%= i %>
+                                            </span>
+                                        <% } else { %>
+                                            <a href="?page=<%= i %>&limit=<%= pagination.limit %>" 
+                                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                                <%= i %>
+                                            </a>
+                                        <% } %>
+                                    <% } %>
+                                    
+                                    <!-- Show last page if not in range -->
+                                    <% if (endPage < pagination.totalPages) { %>
+                                        <% if (endPage < pagination.totalPages - 1) { %>
+                                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white">
+                                                ...
+                                            </span>
+                                        <% } %>
+                                        <a href="?page=<%= pagination.totalPages %>&limit=<%= pagination.limit %>" 
+                                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                            <%= pagination.totalPages %>
+                                        </a>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- Records Per Page Selector -->
+                                <select id="perPageSelector" 
+                                        class="relative inline-flex items-center px-2 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors duration-200">
+                                    <option value="10" <%= pagination.limit === 10 ? 'selected' : '' %>>10 per page</option>
+                                    <option value="25" <%= pagination.limit === 25 ? 'selected' : '' %>>25 per page</option>
+                                    <option value="50" <%= pagination.limit === 50 ? 'selected' : '' %>>50 per page</option>
+                                    <option value="100" <%= pagination.limit === 100 ? 'selected' : '' %>>100 per page</option>
+                                </select>
+                                
+                                <!-- Next Page Button -->
+                                <% if (pagination.hasNext) { %>
+                                    <a href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>" 
+                                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                        Next
+                                        <i class="fas fa-chevron-right ml-1"></i>
+                                    </a>
+                                <% } else { %>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-md text-gray-400 bg-gray-50 cursor-not-allowed">
+                                        Next
+                                        <i class="fas fa-chevron-right ml-1"></i>
+                                    </span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
                 <% } %>
                 
                 <!-- No Results Message (hidden by default) -->
@@ -232,9 +334,88 @@
         const $statusBadgeText = $('#statusBadgeText');
         const $searchBadge = $('#searchBadge');
         const $searchBadgeText = $('#searchBadgeText');
+        const $perPageSelector = $('#perPageSelector');
+        
+        // Handle records per page selector change
+        $perPageSelector.on('change', function() {
+            const newLimit = $(this).val();
+            const currentUrl = new URL(window.location.href);
+            
+            // Update limit parameter
+            currentUrl.searchParams.set('limit', newLimit);
+            // Reset to page 1 when changing items per page
+            currentUrl.searchParams.set('page', '1');
+            
+            // Preserve filters if they exist
+            const statusValue = $statusFilter.val();
+            if (statusValue && statusValue !== 'all') {
+                currentUrl.searchParams.set('status', statusValue);
+            }
+            
+            const searchValue = $searchBox.val();
+            if (searchValue) {
+                currentUrl.searchParams.set('search', searchValue);
+            }
+            
+            // Navigate to new URL
+            window.location.href = currentUrl.toString();
+        });
+        
+        // Update pagination links to preserve filters
+        function updatePaginationLinks() {
+            // Get current filter values
+            const statusValue = $statusFilter.val();
+            const searchValue = $searchBox.val();
+            
+            // Only proceed if we have active filters
+            if ((statusValue && statusValue !== 'all') || searchValue) {
+                // Update all pagination links
+                $('a[href*="?page="]').each(function() {
+                    const link = $(this);
+                    const url = new URL(link.attr('href'), window.location.origin + window.location.pathname);
+                    
+                    // Add status filter if present
+                    if (statusValue && statusValue !== 'all') {
+                        url.searchParams.set('status', statusValue);
+                    }
+                    
+                    // Add search filter if present
+                    if (searchValue) {
+                        url.searchParams.set('search', searchValue);
+                    }
+                    
+                    // Update href attribute
+                    link.attr('href', url.search);
+                });
+            }
+        }
         
         // Initial state check
         updateFilterVisibility();
+        
+        // Check URL parameters for filters on page load
+        function applyUrlFilters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const statusParam = urlParams.get('status');
+            const searchParam = urlParams.get('search');
+            
+            // Apply status filter if in URL
+            if (statusParam) {
+                $statusFilter.val(statusParam);
+            }
+            
+            // Apply search filter if in URL
+            if (searchParam) {
+                $searchBox.val(searchParam);
+                $clearSearch.removeClass('hidden');
+            }
+            
+            // Apply filters if any parameters were found
+            if (statusParam || searchParam) {
+                filterVoters();
+                updatePaginationLinks();
+            }
+        }
         
         function filterVoters() {
             const statusValue = $statusFilter.val() || 'all';
@@ -271,6 +452,9 @@
             
             // Update filter badges
             updateFilterVisibility();
+            
+            // Update pagination links to preserve filters
+            updatePaginationLinks();
         }
         
         function updateFilterVisibility() {
@@ -346,8 +530,64 @@
             }
         });
         
-        // Initialize filtering on page load
-        filterVoters();
+        // Additional event listeners for server-side filtering
+        $statusFilter.on('change', function() {
+            const currentUrl = new URL(window.location.href);
+            const statusValue = $(this).val();
+            
+            // Update or clear status parameter based on selection
+            if (statusValue === 'all') {
+                currentUrl.searchParams.delete('status');
+            } else {
+                currentUrl.searchParams.set('status', statusValue);
+            }
+            
+            // Reset to page 1 when applying filters
+            currentUrl.searchParams.set('page', '1');
+            
+            // Preserve search filter if it exists
+            const searchValue = $searchBox.val();
+            if (searchValue) {
+                currentUrl.searchParams.set('search', searchValue);
+            }
+            
+            // Navigate to new URL
+            window.location.href = currentUrl.toString();
+        });
+        
+        // Use debounce for search input to reduce server requests
+        let searchTimeout;
+        $searchBox.on('input', function() {
+            clearTimeout(searchTimeout);
+            
+            // Wait 500ms after typing stops before submitting search
+            searchTimeout = setTimeout(function() {
+                const currentUrl = new URL(window.location.href);
+                const searchValue = $searchBox.val();
+                
+                // Update or clear search parameter based on input
+                if (!searchValue) {
+                    currentUrl.searchParams.delete('search');
+                } else {
+                    currentUrl.searchParams.set('search', searchValue);
+                }
+                
+                // Reset to page 1 when applying filters
+                currentUrl.searchParams.set('page', '1');
+                
+                // Preserve status filter if it exists
+                const statusValue = $statusFilter.val();
+                if (statusValue && statusValue !== 'all') {
+                    currentUrl.searchParams.set('status', statusValue);
+                }
+                
+                // Navigate to new URL
+                window.location.href = currentUrl.toString();
+            }, 500);
+        });
+        
+        // Apply URL filters on page load
+        applyUrlFilters();
     });
 </script>
 
