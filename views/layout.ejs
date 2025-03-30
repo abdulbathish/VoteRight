@@ -7,11 +7,10 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Add Animate.css for subtle animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
-<body class="h-full flex flex-col bg-gray-100">
-    <header class="bg-white shadow-md">
+<body class="h-full flex flex-col bg-gray-100 font-sans">
+    <header class="bg-white shadow-sm">
         <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 justify-between">
                 <!-- Logo and brand -->
@@ -37,7 +36,7 @@
                     <a href="/status" class="nav-link <%= locals.currentPath === '/status' ? 'nav-link-active' : '' %>">
                         <i class="fas fa-search mr-1.5"></i>Check Status
                     </a>
-                    <a href="/admin/login" class="btn btn-primary ml-2 shadow">
+                    <a href="/admin/login" class="btn btn-primary ml-2 shadow-sm">
                         <i class="fas fa-user-shield mr-1.5"></i>Admin
                     </a>
                 </div>
@@ -77,7 +76,7 @@
         </div>
     </main>
 
-    <footer class="bg-gray-800 text-white shadow-inner">
+    <footer class="bg-gray-800 text-white shadow-inner mt-auto">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-1 md:col-span-2">
@@ -87,7 +86,7 @@
                         </div>
                         <h2 class="text-lg font-semibold">Democracia Voter ID System</h2>
                     </div>
-                    <p class="text-gray-400 mb-4">Official voter identification system for the fictitious country of Democracia.</p>
+                    <p class="text-gray-400 mb-4">Official voter identification system for the country of Democracia.</p>
                     <div class="flex space-x-4">
                         <a href="#" class="bg-gray-700 hover:bg-primary-700 h-10 w-10 rounded-full flex items-center justify-center text-white transition-colors duration-200">
                             <i class="fab fa-facebook-f"></i>
@@ -103,10 +102,10 @@
                 <div>
                     <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Quick Links</h3>
                     <ul class="space-y-3">
-                        <li><a href="/" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Home</a></li>
-                        <li><a href="/apply" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Apply for ID</a></li>
-                        <li><a href="/status" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Check Status</a></li>
-                        <li><a href="/admin/login" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Admin Login</a></li>
+                        <li><a href="/" class="text-gray-400 hover:text-white transition-all duration-200 inline-block">Home</a></li>
+                        <li><a href="/apply" class="text-gray-400 hover:text-white transition-all duration-200 inline-block">Apply for ID</a></li>
+                        <li><a href="/status" class="text-gray-400 hover:text-white transition-all duration-200 inline-block">Check Status</a></li>
+                        <li><a href="/admin/login" class="text-gray-400 hover:text-white transition-all duration-200 inline-block">Admin Login</a></li>
                     </ul>
                 </div>
                 <div>
@@ -153,4 +152,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

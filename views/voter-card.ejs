@@ -7,17 +7,17 @@
             Your Voter ID Card
         </h1>
         <div class="flex space-x-3">
-            <button id="printCard" class="btn btn-outline flex items-center shadow-sm">
+            <button id="printCard" class="btn btn-outline py-2 px-4 rounded-md border border-gray-300 flex items-center shadow-sm hover:bg-gray-50">
                 <i class="fas fa-print mr-2"></i>Print Card
             </button>
-            <button class="btn btn-outline copy-id flex items-center shadow-sm" data-id="<%= voter.voter_id || voter.id %>">
+            <button class="btn btn-outline py-2 px-4 rounded-md border border-gray-300 copy-id flex items-center shadow-sm hover:bg-gray-50" data-id="<%= voter.voter_id || voter.id %>">
                 <i class="fas fa-copy mr-2"></i>Copy ID
             </button>
         </div>
     </div>
     
     <!-- Voter ID Card -->
-    <div class="voter-id-card mb-8 relative overflow-hidden animate__animated animate__fadeInUp">
+    <div class="voter-id-card mb-8 relative overflow-hidden animate__animated animate__fadeInUp bg-gradient-to-r from-primary-600 to-primary-800 text-white p-8 rounded-xl shadow-lg">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-20 pointer-events-none">
             <div class="absolute top-0 right-0 w-full h-full overflow-hidden">
@@ -31,14 +31,14 @@
                 <!-- Left Column (Card Information) -->
                 <div class="col-span-12 md:col-span-9">
                     <!-- Header with logo -->
-                    <div class="voter-id-card-header">
+                    <div class="voter-id-card-header flex items-center space-x-4 mb-6">
                         <div class="bg-white p-2 rounded-md shadow">
                             <img src="/images/democracia-logo.png" alt="Democracia Electoral Commission Logo" 
                                 class="h-12 w-12" onerror="this.src='https://placehold.co/60x60/fff/0369a1?text=EC&font=bold'">
                         </div>
                         <div>
-                            <h2 class="voter-id-card-title">DEMOCRACIA</h2>
-                            <p class="voter-id-card-subtitle">Electoral Commission</p>
+                            <h2 class="voter-id-card-title text-2xl font-bold">DEMOCRACIA</h2>
+                            <p class="voter-id-card-subtitle text-sm text-white/80">Electoral Commission</p>
                         </div>
                     </div>
                     
@@ -47,44 +47,52 @@
                     <!-- Main card details in 2-column grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">Full Name</p>
-                            <p class="voter-id-card-field-value"><%= voter.first_name || voter.firstName %> <%= voter.last_name || voter.lastName %></p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">Full Name</p>
+                            <p class="voter-id-card-field-value font-medium"><%= voter.first_name || voter.firstName %> <%= voter.last_name || voter.lastName %></p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">Voter ID</p>
-                            <p class="voter-id-card-id"><%= voter.voter_id || voter.voterId %></p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">Voter ID</p>
+                            <p class="voter-id-card-id font-mono font-medium"><%= voter.voter_id || voter.voterId %></p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">Date of Birth</p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">Date of Birth</p>
                             <p class="voter-id-card-field-value"><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : (voter.dob ? new Date(voter.dob).toLocaleDateString() : 'Not available') %></p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">Gender</p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">Gender</p>
                             <p class="voter-id-card-field-value"><%= voter.gender || 'Not available' %></p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">National ID</p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">National ID</p>
                             <p class="voter-id-card-field-value"><%= voter.uin || 'Not available' %></p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">Issue Date</p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">Issue Date</p>
                             <p class="voter-id-card-field-value"><%= voter.issue_date ? new Date(voter.issue_date).toLocaleDateString() : 'Not available' %></p>
                         </div>
                         <div class="bg-white/10 p-3 rounded-md">
-                            <p class="voter-id-card-field-label">Expiry Date</p>
+                            <p class="voter-id-card-field-label text-xs text-white/70">Expiry Date</p>
                             <p class="voter-id-card-field-value"><%= expiryDate ? new Date(expiryDate).toLocaleDateString() : 'Not available' %></p>
                         </div>
                     </div>
                     
                     <!-- Address section -->
                     <div class="mt-4 bg-white/10 p-3 rounded-md">
-                        <p class="voter-id-card-field-label">Address</p>
+                        <p class="voter-id-card-field-label text-xs text-white/70">Address</p>
                         <p class="voter-id-card-field-value">
                             <%= voter.address_line1 || voter.addressLine1 || '' %>
-                            <%= (voter.address_line2 || voter.addressLine2) ? ', ' + (voter.address_line2 || voter.addressLine2) : '' %>
-                            <%= voter.city ? ', ' + voter.city : '' %>
-                            <%= (voter.postal_code || voter.postalCode) ? ' ' + (voter.postal_code || voter.postalCode) : '' %>
-                            <%= (!voter.address_line1 && !voter.addressLine1 && !voter.address_line2 && !voter.addressLine2 && !voter.city && !voter.postal_code && !voter.postalCode) ? 'Not available' : '' %>
+                            <% if (voter.address_line2 || voter.addressLine2) { %>
+                            <br><%= voter.address_line2 || voter.addressLine2 %>
+                            <% } %>
+                            <% if (voter.city) { %>
+                            <br><%= voter.city %>
+                            <% } %>
+                            <% if (voter.postal_code || voter.postalCode) { %>
+                            <%= (voter.postal_code || voter.postalCode) %>
+                            <% } %>
+                            <% if (!voter.address_line1 && !voter.addressLine1 && !voter.address_line2 && !voter.addressLine2 && !voter.city && !voter.postal_code && !voter.postalCode) { %>
+                            Not available
+                            <% } %>
                         </p>
                     </div>
                 </div>
@@ -107,9 +115,9 @@
             </div>
             
             <!-- Card footer -->
-            <div class="voter-id-card-footer flex justify-between items-end">
+            <div class="voter-id-card-footer flex justify-between items-end mt-6 pt-4 border-t border-white/20">
                 <div class="max-w-lg">
-                    <p>This card is the property of the Democracia Electoral Commission. If found, please return to the nearest electoral office.</p>
+                    <p class="text-sm text-white/80">This card is the property of the Democracia Electoral Commission. If found, please return to the nearest electoral office.</p>
                 </div>
                 <div class="flex-shrink-0 bg-white rounded-md p-1">
                     <img src="/images/signature.png" alt="Official Signature" class="h-10" 
@@ -120,14 +128,14 @@
     </div>
     
     <!-- Important Information Card -->
-    <div class="card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
-        <div class="card-header">
+    <div class="card bg-white shadow-sm rounded-lg overflow-hidden animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+        <div class="card-header px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h3 class="text-lg font-medium text-gray-900 flex items-center">
                 <i class="fas fa-info-circle text-primary-600 mr-2"></i>
                 Important Information
             </h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-6">
             <ul class="space-y-3 text-gray-700 mb-6">
                 <li class="flex items-start bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-200">
                     <i class="fas fa-check-circle text-primary-600 mt-1 mr-3"></i>
@@ -191,4 +199,4 @@
             });
         });
     });
-</script> 
+</script>

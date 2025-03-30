@@ -1,186 +1,215 @@
-<%- include('../partials/header', {title: title || 'Voter Details - Democracia Electoral Commission'}) %>
-
 <div class="container mt-4">
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <h1 class="h3">
-        <a href="/admin/dashboard" class="text-decoration-none text-muted me-2">
-          <i class="fas fa-arrow-left"></i>
-        </a>
-        Voter Details
-      </h1>
-      <p class="text-muted">View and manage voter information</p>
+  <div class="flex items-center mb-6">
+    <a href="/admin/dashboard" class="flex items-center text-gray-500 hover:text-primary-600 mr-3">
+      <i class="fas fa-arrow-left mr-2"></i>
+      <span>Back to Dashboard</span>
+    </a>
+  </div>
+  
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Voter Details</h1>
+      <p class="text-gray-500">View and manage voter information</p>
     </div>
-    <div class="col-md-4 text-end">
+    <div>
       <% if (voter.status === 'pending') { %>
-        <div class="btn-group">
-          <form action="/admin/approve/<%= voter.registration_id %>?returnTo=/admin/voter/<%= voter.registration_id %>" method="POST" class="d-inline">
-            <button type="submit" class="btn btn-success me-2">
-              <i class="fas fa-check me-1"></i>Approve
+        <div class="flex space-x-2">
+          <form action="/admin/approve/<%= voter.registration_id %>?returnTo=/admin/voter/<%= voter.registration_id %>" method="POST" class="inline">
+            <button type="submit" class="btn btn-success py-2 px-4 rounded-md text-sm font-medium flex items-center bg-success-600 text-white hover:bg-success-700">
+              <i class="fas fa-check mr-1"></i>Approve
             </button>
           </form>
-          <form action="/admin/reject/<%= voter.registration_id %>?returnTo=/admin/voter/<%= voter.registration_id %>" method="POST" class="d-inline">
-            <button type="submit" class="btn btn-danger">
-              <i class="fas fa-times me-1"></i>Reject
+          <form action="/admin/reject/<%= voter.registration_id %>?returnTo=/admin/voter/<%= voter.registration_id %>" method="POST" class="inline">
+            <button type="submit" class="btn btn-danger py-2 px-4 rounded-md text-sm font-medium flex items-center bg-danger-600 text-white hover:bg-danger-700">
+              <i class="fas fa-times mr-1"></i>Reject
             </button>
           </form>
         </div>
       <% } else if (voter.status === 'approved') { %>
-        <span class="badge bg-success fs-6 py-2 px-3">
-          <i class="fas fa-check-circle me-1"></i>Approved
+        <span class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-success-100 text-success-800">
+          <i class="fas fa-check-circle mr-1"></i>Approved
         </span>
       <% } else if (voter.status === 'rejected') { %>
-        <span class="badge bg-danger fs-6 py-2 px-3">
-          <i class="fas fa-times-circle me-1"></i>Rejected
+        <span class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-danger-100 text-danger-800">
+          <i class="fas fa-times-circle mr-1"></i>Rejected
         </span>
       <% } %>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-4 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h5>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Personal Information Card -->
+    <div class="card bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="card-header bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-3 text-white">
+        <h2 class="text-lg font-semibold flex items-center">
+          <i class="fas fa-user mr-2"></i>Personal Information
+        </h2>
+      </div>
+      <div class="card-body p-6">
+        <div class="text-center mb-6">
+          <% if (voter.photo) { %>
+            <img src="<%= voter.photo.startsWith('{') ? '/images/user-placeholder.png' : voter.photo %>" 
+                 alt="Voter Photo" class="h-40 w-40 object-cover rounded-lg mx-auto mb-3 shadow">
+          <% } else { %>
+            <img src="/images/user-placeholder.png" alt="No Photo" class="h-40 w-40 object-cover rounded-lg mx-auto mb-3 shadow">
+          <% } %>
+          <h3 class="text-xl font-semibold text-gray-900"><%= voter.first_name %> <%= voter.last_name %></h3>
+          <% if (voter.voter_id) { %>
+            <p class="text-primary-600 font-mono"><%= voter.voter_id %></p>
+          <% } %>
         </div>
-        <div class="card-body">
-          <div class="text-center mb-4">
-            <% if (voter.photo) { %>
-              <img src="<%= voter.photo.startsWith('{') ? '/images/user-placeholder.png' : voter.photo %>" 
-                   alt="Voter Photo" class="img-fluid rounded mb-3" style="max-width: 200px;">
-            <% } else { %>
-              <img src="/images/user-placeholder.png" alt="No Photo" class="img-fluid rounded mb-3" style="max-width: 200px;">
-            <% } %>
-            <h4><%= voter.first_name %> <%= voter.last_name %></h4>
-            <% if (voter.voter_id) { %>
-              <p class="voter-id mb-0"><%= voter.voter_id %></p>
-            <% } %>
+        
+        <div class="space-y-3">
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">Registration ID:</span>
+            <span class="font-medium text-gray-900 text-xs" style="word-break: break-all;"><%= voter.registration_id %></span>
           </div>
-          
-          <table class="table table-borderless">
-            <tr>
-              <th scope="row">Registration ID:</th>
-              <td><%= voter.registration_id %></td>
-            </tr>
-            <tr>
-              <th scope="row">UIN:</th>
-              <td><%= voter.uin || 'N/A' %></td>
-            </tr>
-            <tr>
-              <th scope="row">Date of Birth:</th>
-              <td><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : 'N/A' %></td>
-            </tr>
-            <tr>
-              <th scope="row">Gender:</th>
-              <td><%= voter.gender || 'N/A' %></td>
-            </tr>
-          </table>
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">UIN:</span>
+            <span class="font-medium text-gray-900"><%= voter.uin || 'N/A' %></span>
+          </div>
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">Date of Birth:</span>
+            <span class="font-medium text-gray-900"><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : 'N/A' %></span>
+          </div>
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">Gender:</span>
+            <span class="font-medium text-gray-900"><%= voter.gender || 'N/A' %></span>
+          </div>
         </div>
       </div>
     </div>
     
-    <div class="col-md-8">
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="fas fa-address-card me-2"></i>Address & Contact Information</h5>
+    <!-- Contact & Address Information -->
+    <div class="space-y-6">
+      <div class="card bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="card-header bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-white">
+          <h2 class="text-lg font-semibold flex items-center">
+            <i class="fas fa-address-card mr-2"></i>Contact & Address
+          </h2>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <h6 class="fw-bold">Address</h6>
-              <p>
-                <%= voter.address_line1 || 'N/A' %><br>
-                <%= voter.address_line2 ? voter.address_line2 + '<br>' : '' %>
-                <%= voter.city ? voter.city + ', ' : '' %>
-                <%= voter.postal_code || '' %>
+        <div class="card-body p-6">
+          <div class="space-y-4">
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-2">Contact Information</h3>
+              <div class="space-y-2">
+                <div class="flex items-start">
+                  <i class="fas fa-envelope mt-1 text-primary-600 w-5"></i>
+                  <span class="ml-2"><%= typeof voter.email !== 'undefined' ? (voter.email || 'N/A') : 'N/A' %></span>
+                </div>
+                <div class="flex items-start">
+                  <i class="fas fa-phone mt-1 text-primary-600 w-5"></i>
+                  <span class="ml-2"><%= typeof voter.phone !== 'undefined' ? (voter.phone || 'N/A') : 'N/A' %></span>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-2">Address</h3>
+              <p class="text-gray-900">
+                <%= voter.address_line1 || 'N/A' %>
+                <% if (voter.address_line2) { %>
+                <br><%= voter.address_line2 %>
+                <% } %>
+                <% if (voter.city) { %>
+                <br><%= voter.city %>
+                <% } %>
+                <% if (voter.postal_code) { %>
+                <%= voter.postal_code %>
+                <% } %>
               </p>
             </div>
           </div>
         </div>
       </div>
       
-      <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Voter ID Card Information</h5>
+      <!-- Audit Information -->
+      <div class="card bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="card-header bg-gradient-to-r from-gray-600 to-gray-700 px-4 py-3 text-white">
+          <h2 class="text-lg font-semibold flex items-center">
+            <i class="fas fa-history mr-2"></i>Audit Information
+          </h2>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <table class="table table-borderless">
-                <tr>
-                  <th scope="row">Issue Date:</th>
-                  <td><%= voter.issue_date ? new Date(voter.issue_date).toLocaleDateString() : 'Not issued yet' %></td>
-                </tr>
-                <tr>
-                  <th scope="row">Expiry Date:</th>
-                  <td><%= voter.expiry_date ? new Date(voter.expiry_date).toLocaleDateString() : 'Not applicable' %></td>
-                </tr>
-                <tr>
-                  <th scope="row">Status:</th>
-                  <td>
-                    <% if (voter.status === 'pending') { %>
-                      <span class="badge bg-warning text-dark">Pending</span>
-                    <% } else if (voter.status === 'approved') { %>
-                      <span class="badge bg-success">Approved</span>
-                    <% } else if (voter.status === 'rejected') { %>
-                      <span class="badge bg-danger">Rejected</span>
-                    <% } else { %>
-                      <span class="badge bg-secondary"><%= voter.status %></span>
-                    <% } %>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Source:</th>
-                  <td>
-                    <% if (voter.source === 'manual_application') { %>
-                      <span class="badge bg-info">Manual Application</span>
-                    <% } else if (voter.source === 'subsafe_notification') { %>
-                      <span class="badge bg-primary">National Identity System</span>
-                    <% } else { %>
-                      <span class="badge bg-secondary"><%= voter.source || 'Unknown' %></span>
-                    <% } %>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Email:</th>
-                  <td><%= typeof voter.email !== 'undefined' ? (voter.email || 'N/A') : 'N/A' %></td>
-                </tr>
-                <tr>
-                  <th scope="row">Phone:</th>
-                  <td><%= typeof voter.phone !== 'undefined' ? (voter.phone || 'N/A') : 'N/A' %></td>
-                </tr>
-              </table>
+        <div class="card-body p-6">
+          <div class="space-y-3">
+            <div class="flex justify-between border-b border-gray-100 pb-2">
+              <span class="text-gray-600">Created:</span>
+              <span class="font-medium text-gray-900"><%= new Date(voter.created_at).toLocaleString() %></span>
             </div>
-            <div class="col-md-6">
-              <% if (voter.status === 'approved') { %>
-                <a href="/voter-card/<%= voter.registration_id %>" class="btn btn-primary" target="_blank">
-                  <i class="fas fa-id-card me-1"></i>View Voter ID Card
-                </a>
-              <% } %>
+            <div class="flex justify-between border-b border-gray-100 pb-2">
+              <span class="text-gray-600">Last Updated:</span>
+              <span class="font-medium text-gray-900"><%= new Date(voter.updated_at).toLocaleString() %></span>
+            </div>
+            <div class="flex justify-between border-b border-gray-100 pb-2">
+              <span class="text-gray-600">Source:</span>
+              <span>
+                <% if (voter.source === 'manual_application') { %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <i class="fas fa-keyboard mr-1"></i>Manual Application
+                  </span>
+                <% } else if (voter.source === 'subsafe_notification') { %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                    <i class="fas fa-shield-alt mr-1"></i>National Identity System
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <%= voter.source || 'Unknown' %>
+                  </span>
+                <% } %>
+              </span>
             </div>
           </div>
         </div>
       </div>
-      
-      <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="fas fa-history me-2"></i>Audit Information</h5>
+    </div>
+    
+    <!-- Voter ID Card Information -->
+    <div class="card bg-white shadow-sm rounded-lg overflow-hidden">
+      <div class="card-header bg-gradient-to-r from-success-600 to-success-700 px-4 py-3 text-white">
+        <h2 class="text-lg font-semibold flex items-center">
+          <i class="fas fa-id-card mr-2"></i>Voter ID Card Information
+        </h2>
+      </div>
+      <div class="card-body p-6">
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">Issue Date:</span>
+            <span class="font-medium text-gray-900"><%= voter.issue_date ? new Date(voter.issue_date).toLocaleDateString() : 'Not issued yet' %></span>
+          </div>
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">Expiry Date:</span>
+            <span class="font-medium text-gray-900"><%= voter.expiry_date ? new Date(voter.expiry_date).toLocaleDateString() : 'Not applicable' %></span>
+          </div>
+          <div class="flex justify-between border-b border-gray-100 pb-2">
+            <span class="text-gray-600">Status:</span>
+            <span>
+              <% if (voter.status === 'pending') { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  <i class="fas fa-clock mr-1"></i>Pending
+                </span>
+              <% } else if (voter.status === 'approved') { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                  <i class="fas fa-check-circle mr-1"></i>Approved
+                </span>
+              <% } else if (voter.status === 'rejected') { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-danger-100 text-danger-800">
+                  <i class="fas fa-times-circle mr-1"></i>Rejected
+                </span>
+              <% } else { %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <%= voter.status %>
+                </span>
+              <% } %>
+            </span>
+          </div>
         </div>
-        <div class="card-body">
-          <table class="table table-borderless">
-            <tr>
-              <th scope="row">Created:</th>
-              <td><%= new Date(voter.created_at).toLocaleString() %></td>
-            </tr>
-            <tr>
-              <th scope="row">Last Updated:</th>
-              <td><%= new Date(voter.updated_at).toLocaleString() %></td>
-            </tr>
-          </table>
-        </div>
+        
+        <% if (voter.status === 'approved') { %>
+          <a href="/voter-card/<%= voter.registration_id %>" class="btn btn-primary py-2 px-4 w-full flex items-center justify-center rounded-md text-sm font-medium" target="_blank">
+            <i class="fas fa-id-card mr-2"></i>View Voter ID Card
+          </a>
+        <% } %>
       </div>
     </div>
   </div>
 </div>
-
-<%- include('../partials/footer') %> 

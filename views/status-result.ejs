@@ -77,12 +77,12 @@
         
         <!-- Application Details -->
         <div class="px-6 pb-6">
-            <div class="card mb-6">
-                <div class="card-header flex items-center">
+            <div class="card border border-gray-200 rounded-lg mb-6">
+                <div class="card-header bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center">
                     <i class="fas fa-info-circle text-primary-600 mr-2"></i>
                     <h3 class="text-base font-medium text-gray-900">Application Details</h3>
                 </div>
-                <div class="card-body px-0 pb-0">
+                <div class="card-body p-0">
                     <div class="overflow-hidden">
                         <table class="min-w-full divide-y divide-gray-200">
                             <tbody class="divide-y divide-gray-200">
@@ -92,7 +92,7 @@
                                 </tr>
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">RID (Registration ID)</td>
-                                    <td class="py-3 px-3 text-sm font-semibold text-gray-900"><%= voter.registration_id || voter.registrationId %></td>
+                                    <td class="py-3 px-3 text-sm font-semibold text-gray-900" style="word-break: break-all;"><%= voter.registration_id || voter.registrationId %></td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Name</td>
@@ -109,11 +109,16 @@
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Address</td>
                                     <td class="py-3 px-3 text-sm text-gray-900">
-                                        <%= voter.address_line1 || voter.addressLine1 %><br>
+                                        <%= voter.address_line1 || voter.addressLine1 || 'N/A' %>
                                         <% if (voter.address_line2 || voter.addressLine2) { %>
-                                            <%= voter.address_line2 || voter.addressLine2 %><br>
+                                            <br><%= voter.address_line2 || voter.addressLine2 %>
                                         <% } %>
-                                        <%= voter.city %>, <%= voter.postal_code || voter.postalCode %>
+                                        <% if (voter.city) { %>
+                                            <br><%= voter.city %>
+                                        <% } %>
+                                        <% if (voter.postal_code || voter.postalCode) { %>
+                                            <%= voter.postal_code || voter.postalCode %>
+                                        <% } %>
                                     </td>
                                 </tr>
                                 <tr>
@@ -169,7 +174,7 @@
                                 You can now download your digital voter ID card or visit our office to collect the physical card.
                             </p>
                             <div class="mt-3">
-                                <a href="/voter-card/<%= voter.registration_id %>" class="btn btn-success" target="_blank">
+                                <a href="/voter-card/<%= voter.registration_id %>" class="btn btn-success py-2 px-4 rounded-md inline-flex items-center text-sm font-medium" target="_blank">
                                     <i class="fas fa-download mr-2"></i>Download Digital Voter ID
                                 </a>
                             </div>
@@ -208,13 +213,13 @@
             
             <!-- Navigation buttons -->
             <div class="flex flex-col-reverse sm:flex-row sm:justify-between sm:space-x-4 space-y-4 space-y-reverse sm:space-y-0">
-                <a href="/status" class="btn btn-secondary">
+                <a href="/status" class="btn btn-secondary py-2 px-4 rounded-md inline-flex items-center justify-center text-sm font-medium">
                     <i class="fas fa-arrow-left mr-2"></i>Back to Status Check
                 </a>
-                <a href="/" class="btn btn-primary">
+                <a href="/" class="btn btn-primary py-2 px-4 rounded-md inline-flex items-center justify-center text-sm font-medium">
                     <i class="fas fa-home mr-2"></i>Return to Home
                 </a>
             </div>
         </div>
     </div>
-</div> 
+</div>
