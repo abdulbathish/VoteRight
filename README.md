@@ -1,6 +1,6 @@
-# Democracia Voter ID System
+# VoteRight: Secure Voter ID System
 
-A web application for issuing voter ID cards for the fictitious country of Democracia. This application allows citizens to apply for a voter ID, check their application status, and for administrators to review and approve applications. It also integrates with WebSub for receiving and processing voter registration data from external systems.
+A web application for secure voter ID verification and management. This application allows citizens to apply for a voter ID, check their application status, and for administrators to review and approve applications. It also integrates with WebSub for receiving and processing voter registration data from external systems.
 
 ## Features
 
@@ -35,8 +35,8 @@ A web application for issuing voter ID cards for the fictitious country of Democ
 
 1. Clone the repository
 ```
-git clone https://github.com/yourusername/votercard-issuer.git
-cd votercard-issuer
+git clone https://github.com/yourusername/VoteRight.git
+cd VoteRight
 ```
 
 2. Install dependencies

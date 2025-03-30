@@ -1,5 +1,5 @@
 {
-  "name": "votercard-issuer",
+  "name": "VoteRight",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   ],
   "author": "",
   "license": "ISC",
-  "description": "A web application for issuing voter ID cards for a fictitious country",
+  "description": "A web application for secure voter ID verification and management",
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "autoprefixer": "^10.4.16",
