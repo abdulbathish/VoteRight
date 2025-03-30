@@ -359,6 +359,24 @@ app.get('/admin/dashboard', isAdminLoggedIn, (req, res) => {
   res.render('admin-dashboard', { voters: voterDatabase, title: 'Admin Dashboard - Democracia Electoral Commission' });
 });
 
+// Individual voter details page
+app.get('/admin/voter/:id', isAdminLoggedIn, (req, res) => {
+  const { id } = req.params;
+  const voter = voterDatabase.find(v => v.id === id);
+  
+  if (!voter) {
+    return res.status(404).render('error', { 
+      message: 'Voter not found', 
+      title: 'Error - Democracia Electoral Commission'
+    });
+  }
+  
+  res.render('admin-voter-detail', { 
+    voter, 
+    title: `Voter Details: ${voter.firstName} ${voter.lastName} - Democracia Electoral Commission` 
+  });
+});
+
 app.post('/admin/approve/:id', isAdminLoggedIn, (req, res) => {
   const { id } = req.params;
   const voterIndex = voterDatabase.findIndex(v => v.id === id);
@@ -368,7 +386,9 @@ app.post('/admin/approve/:id', isAdminLoggedIn, (req, res) => {
     voterDatabase[voterIndex].approvedAt = new Date();
   }
   
-  res.redirect('/admin/dashboard');
+  // Check if a redirect URL is specified
+  const returnTo = req.query.returnTo || '/admin/dashboard';
+  res.redirect(returnTo);
 });
 
 app.post('/admin/reject/:id', isAdminLoggedIn, (req, res) => {
@@ -380,7 +400,9 @@ app.post('/admin/reject/:id', isAdminLoggedIn, (req, res) => {
     voterDatabase[voterIndex].rejectedAt = new Date();
   }
   
-  res.redirect('/admin/dashboard');
+  // Check if a redirect URL is specified
+  const returnTo = req.query.returnTo || '/admin/dashboard';
+  res.redirect(returnTo);
 });
 
 app.get('/admin/logout', (req, res) => {

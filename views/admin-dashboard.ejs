@@ -1,202 +1,241 @@
-<div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold flex items-center"><i class="fas fa-tachometer-alt mr-2"></i>Admin Dashboard</h2>
-    <a href="/admin/logout" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition flex items-center">
-        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-    </a>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-blue-600 text-white rounded-lg shadow-md p-6">
-        <div class="flex justify-between items-start">
-            <div>
-                <h5 class="text-lg font-semibold mb-1">Total Applications</h5>
-                <h2 class="text-4xl font-bold"><%= voters.length %></h2>
-            </div>
-            <div class="bg-blue-500 p-3 rounded-full">
-                <i class="fas fa-file-alt text-3xl"></i>
-            </div>
-        </div>
-    </div>
-    
-    <div class="bg-green-600 text-white rounded-lg shadow-md p-6">
-        <div class="flex justify-between items-start">
-            <div>
-                <h5 class="text-lg font-semibold mb-1">Approved</h5>
-                <h2 class="text-4xl font-bold"><%= voters.filter(voter => voter.status === 'approved').length %></h2>
-            </div>
-            <div class="bg-green-500 p-3 rounded-full">
-                <i class="fas fa-check-circle text-3xl"></i>
-            </div>
-        </div>
-    </div>
-    
-    <div class="bg-yellow-500 text-white rounded-lg shadow-md p-6">
-        <div class="flex justify-between items-start">
-            <div>
-                <h5 class="text-lg font-semibold mb-1">Pending</h5>
-                <h2 class="text-4xl font-bold"><%= voters.filter(voter => voter.status === 'pending').length %></h2>
-            </div>
-            <div class="bg-yellow-400 p-3 rounded-full">
-                <i class="fas fa-clock text-3xl"></i>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="bg-gray-100 px-6 py-4 border-b">
-        <h3 class="text-xl font-semibold">Voter ID Applications</h3>
-    </div>
-    <div class="p-6">
-        <% if (voters.length === 0) { %>
-            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
-                <div class="flex">
-                    <i class="fas fa-info-circle mt-1 mr-2"></i>
-                    <p>No applications have been submitted yet.</p>
+<!-- Admin Dashboard -->
+<div class="bg-gray-50 min-h-screen pb-8">
+    <div class="container mx-auto px-4 pt-6">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-user-shield text-blue-600 mr-3"></i>
+            Administration Portal
+        </h1>
+        
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <!-- Total Applications Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md p-4">
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-1">
+                        <i class="fas fa-file-alt text-blue-600 text-lg mr-2"></i>
+                        <span class="text-gray-500 text-xs uppercase font-medium">TOTAL APPLICATIONS</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= voters.length %></h2>
                 </div>
             </div>
-        <% } else { %>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-800 text-white">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Date of Birth</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Application Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <% voters.forEach(voter => { %>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><%= voter.id %></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><%= voter.firstName %> <%= voter.lastName %></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><%= voter.dob %></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm"><%= voter.createdAt.toLocaleDateString() %></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <% if(voter.status === 'approved') { %>
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
-                                    <% } else if(voter.status === 'rejected') { %>
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-                                    <% } else { %>
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                    <% } %>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div class="flex space-x-2">
-                                        <button class="p-1.5 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition" data-bs-toggle="modal" data-bs-target="#viewModal<%= voter.id.replace(/\W/g, '') %>">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <% if(voter.status === 'pending') { %>
-                                            <form action="/admin/approve/<%= voter.id %>" method="POST" class="inline">
-                                                <button type="submit" class="p-1.5 bg-green-100 text-green-600 rounded hover:bg-green-200 transition">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                            </form>
-                                            <form action="/admin/reject/<%= voter.id %>" method="POST" class="inline">
-                                                <button type="submit" class="p-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200 transition">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
-                                        <% } %>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <!-- View Modal for each voter -->
-                            <div class="modal fade" id="viewModal<%= voter.id.replace(/\W/g, '') %>" tabindex="-1">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header border-b">
-                                            <h5 class="text-lg font-semibold">Application Details</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body p-6">
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                <div class="col-span-2">
-                                                    <table class="min-w-full border">
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">ID:</th>
-                                                            <td class="py-2 px-4"><%= voter.id %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">First Name:</th>
-                                                            <td class="py-2 px-4"><%= voter.firstName %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">Last Name:</th>
-                                                            <td class="py-2 px-4"><%= voter.lastName %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">Date of Birth:</th>
-                                                            <td class="py-2 px-4"><%= voter.dob %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">Address:</th>
-                                                            <td class="py-2 px-4"><%= voter.address %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">National ID:</th>
-                                                            <td class="py-2 px-4"><%= voter.idNumber %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">RID:</th>
-                                                            <td class="py-2 px-4"><%= voter.registrationId || voter.idNumber %></td>
-                                                        </tr>
-                                                        <tr class="border-b">
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">Application Date:</th>
-                                                            <td class="py-2 px-4"><%= voter.createdAt.toLocaleDateString() %></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th class="py-2 px-4 bg-gray-100 text-left">Status:</th>
-                                                            <td class="py-2 px-4">
-                                                                <% if(voter.status === 'approved') { %>
-                                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Approved</span>
-                                                                <% } else if(voter.status === 'rejected') { %>
-                                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Rejected</span>
-                                                                <% } else { %>
-                                                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                                                                <% } %>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
+            
+            <!-- Approved Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md p-4">
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-1">
+                        <i class="fas fa-check-circle text-green-600 text-lg mr-2"></i>
+                        <span class="text-gray-500 text-xs uppercase font-medium">APPROVED</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= voters.filter(voter => voter.status === 'approved').length %></h2>
+                </div>
+            </div>
+            
+            <!-- Pending Card -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md p-4">
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-1">
+                        <i class="fas fa-clock text-amber-600 text-lg mr-2"></i>
+                        <span class="text-gray-500 text-xs uppercase font-medium">PENDING</span>
+                    </div>
+                    <h2 class="text-3xl font-bold text-gray-800 pl-7"><%= voters.filter(voter => voter.status === 'pending').length %></h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications List -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+            <div class="border-b border-gray-100">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center p-4 md:p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 md:mb-0">Voter ID Applications</h3>
+                    
+                    <!-- Filter Controls -->
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                        <select id="statusFilter" class="form-select rounded-lg border-gray-200 text-sm py-2 px-3 w-full sm:w-auto focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        
+                        <div class="relative w-full sm:w-64">
+                            <input type="text" id="searchBox" placeholder="Search applicants..." 
+                                   class="form-input w-full rounded-lg border-gray-200 pl-10 text-sm py-2" />
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 md:p-6">
+                <% if (voters.length === 0) { %>
+                    <div class="flex flex-col items-center justify-center py-12 text-center">
+                        <div class="bg-blue-50 rounded-full p-5 mb-4">
+                            <i class="fas fa-folder-open text-blue-500 text-3xl"></i>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-700 mb-2">No Applications Yet</h4>
+                        <p class="text-gray-500 max-w-md">No voter ID applications have been submitted yet. They will appear here once received.</p>
+                    </div>
+                <% } else { %>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Birth</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Application Date</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                <% voters.forEach(voter => { %>
+                                    <tr class="hover:bg-gray-50 transition-colors voter-row" 
+                                        data-status="<%= voter.status %>"
+                                        data-search="<%= voter.firstName.toLowerCase() %> <%= voter.lastName.toLowerCase() %> <%= voter.id.toLowerCase() %>">
+                                        <td class="px-4 py-4 text-sm text-gray-600 whitespace-nowrap"><%= voter.id %></td>
+                                        <td class="px-4 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full overflow-hidden">
+                                                    <% if(voter.photoPath) { %>
+                                                        <img src="/<%= voter.photoPath %>" alt="<%= voter.firstName %>" class="h-full w-full object-cover">
+                                                    <% } else { %>
+                                                        <div class="h-full w-full flex items-center justify-center">
+                                                            <i class="fas fa-user text-gray-400"></i>
+                                                        </div>
+                                                    <% } %>
                                                 </div>
-                                                <div>
-                                                    <div class="border rounded-lg overflow-hidden">
-                                                        <div class="bg-gray-100 px-4 py-2 border-b">
-                                                            <h6 class="font-medium">Applicant Photo</h6>
-                                                        </div>
-                                                        <div class="p-4 text-center">
-                                                            <% if(voter.photoPath) { %>
-                                                                <img src="/<%= voter.photoPath %>" alt="Applicant Photo" class="max-w-full mx-auto">
-                                                            <% } else { %>
-                                                                <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3">No photo uploaded</div>
-                                                            <% } %>
-                                                        </div>
-                                                    </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900"><%= voter.firstName %> <%= voter.lastName %></div>
+                                                    <div class="text-sm text-gray-500"><%= voter.idNumber %></div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer border-t p-4 flex justify-end space-x-2">
-                                            <button type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition" data-bs-dismiss="modal">Close</button>
-                                            <% if(voter.status === 'pending') { %>
-                                                <form action="/admin/approve/<%= voter.id %>" method="POST" class="inline">
-                                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Approve</button>
-                                                </form>
-                                                <form action="/admin/reject/<%= voter.id %>" method="POST" class="inline">
-                                                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Reject</button>
-                                                </form>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm text-gray-600 whitespace-nowrap"><%= voter.dob %></td>
+                                        <td class="px-4 py-4 text-sm text-gray-600 whitespace-nowrap"><%= voter.createdAt.toLocaleDateString() %></td>
+                                        <td class="px-4 py-4 whitespace-nowrap">
+                                            <% if(voter.status === 'approved') { %>
+                                                <span class="px-3 py-1.5 inline-flex items-center text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1.5"></i> Approved
+                                                </span>
+                                            <% } else if(voter.status === 'rejected') { %>
+                                                <span class="px-3 py-1.5 inline-flex items-center text-xs leading-4 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    <i class="fas fa-times-circle mr-1.5"></i> Rejected
+                                                </span>
+                                            <% } else { %>
+                                                <span class="px-3 py-1.5 inline-flex items-center text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    <i class="fas fa-clock mr-1.5"></i> Pending
+                                                </span>
                                             <% } %>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }) %>
-                    </tbody>
-                </table>
+                                        </td>
+                                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="/admin/voter/<%= voter.id %>" 
+                                                   class="p-2 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition inline-flex items-center justify-center w-8 h-8"
+                                                   title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <% if(voter.status === 'pending') { %>
+                                                    <form action="/admin/approve/<%= voter.id %>" method="POST" class="inline">
+                                                        <button type="submit" 
+                                                                class="p-2 bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition inline-flex items-center justify-center w-8 h-8"
+                                                                title="Approve Application">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form action="/admin/reject/<%= voter.id %>" method="POST" class="inline">
+                                                        <button type="submit" 
+                                                                class="p-2 bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition inline-flex items-center justify-center w-8 h-8"
+                                                                title="Reject Application">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } %>
+                
+                <!-- No Results Message (hidden by default) -->
+                <div id="noResultsMessage" class="flex flex-col items-center justify-center py-8 text-center hidden">
+                    <div class="bg-blue-50 rounded-full p-3 mb-3">
+                        <i class="fas fa-search text-blue-500 text-xl"></i>
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-700 mb-2">No Matching Results</h4>
+                    <p class="text-gray-500 max-w-md">No applications match your current search criteria. Try adjusting your filters.</p>
+                </div>
             </div>
-        <% } %>
+        </div>
     </div>
-</div> 
+</div>
+
+<!-- Note: Switched from modal popup to direct links to individual voter pages -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Enhanced filtering system
+        const $statusFilter = $('#statusFilter');
+        const $searchBox = $('#searchBox');
+        const $voterRows = $('.voter-row');
+        const $noResultsMessage = $('#noResultsMessage');
+        
+        function filterVoters() {
+            const statusValue = $statusFilter.val() || 'all';
+            const searchValue = $searchBox.val().toLowerCase();
+            
+            let visibleCount = 0;
+            
+            $voterRows.each(function() {
+                const $row = $(this);
+                const rowStatus = $row.data('status');
+                const rowSearchText = $row.data('search');
+                
+                // Check if status matches (or 'all' is selected)
+                const statusMatch = statusValue === 'all' || rowStatus === statusValue;
+                
+                // Check if search text matches the combined data
+                const searchMatch = searchValue === '' || rowSearchText.includes(searchValue);
+                
+                // Show/hide the row based on combined filters
+                if (statusMatch && searchMatch) {
+                    $row.show();
+                    visibleCount++;
+                } else {
+                    $row.hide();
+                }
+            });
+            
+            // Show/hide no results message
+            if (visibleCount === 0 && $voterRows.length > 0) {
+                $noResultsMessage.removeClass('hidden');
+            } else {
+                $noResultsMessage.addClass('hidden');
+            }
+        }
+        
+        // Add event listeners
+        $statusFilter.on('change', filterVoters);
+        $searchBox.on('input', filterVoters);
+        
+        // Add clear button functionality
+        $searchBox.on('keyup', function(e) {
+            if (e.key === 'Escape') {
+                $(this).val('');
+                filterVoters();
+            }
+        });
+        
+        // Initialize filtering on page load
+        filterVoters();
+    });
+</script>
+
+<!-- Font Awesome for icons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" integrity="sha512-Tn2m0TIpgVyTzzvmxLNuqbSJH3JP8jm+Cy3hvHrW7ndTDcJ1w5mBiksqDBb8GpE2ksktFvDB/ykZ0mDpsZj20w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
