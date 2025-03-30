@@ -44,27 +44,68 @@
 
         <!-- Applications List -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-            <div class="border-b border-gray-100">
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center p-4 md:p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 md:mb-0">Voter ID Applications</h3>
+            <!-- Improved Filter Controls Section -->
+            <div class="border-b border-gray-100 bg-gray-50">
+                <div class="flex items-center justify-between p-4 md:p-6">
+                    <h3 class="text-lg font-semibold text-gray-800">Voter ID Applications</h3>
                     
-                    <!-- Filter Controls -->
-                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                        <select id="statusFilter" class="form-select rounded-lg border-gray-200 text-sm py-2 px-3 w-full sm:w-auto focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
+                    <div class="flex flex-row items-center space-x-3">
+                        <!-- Status Dropdown with Icon -->
+                        <div class="relative">
+                            <select id="statusFilter" class="appearance-none pl-10 pr-10 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors duration-200 shadow-sm hover:border-gray-300">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-filter text-gray-400"></i>
+                            </div>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                            </div>
+                        </div>
                         
-                        <div class="relative w-full sm:w-64">
-                            <input type="text" id="searchBox" placeholder="Search applicants..." 
-                                   class="form-input w-full rounded-lg border-gray-200 pl-10 text-sm py-2" />
+                        <!-- Improved Search Box with Clear Button -->
+                        <div class="relative">
+                            <input type="text" id="searchBox" placeholder="Search by name or ID" 
+                                   class="pl-10 pr-10 py-2 w-64 border border-gray-200 rounded-lg text-sm text-gray-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-colors duration-200 shadow-sm hover:border-gray-300" />
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
+                            <button id="clearSearch" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200 hidden">
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Active Filters Section -->
+                <div id="activeFilters" class="px-6 pb-4 flex flex-wrap items-center gap-2 hidden">
+                    <span class="text-sm font-medium text-gray-500">Active filters:</span>
+                    <!-- Status filter badge (added dynamically) -->
+                    <div id="statusBadge" class="hidden px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full flex items-center">
+                        <i class="fas fa-filter text-blue-600 mr-2"></i>
+                        <span id="statusBadgeText">Status: All</span>
+                        <button class="ml-2 focus:outline-none hover:text-blue-800" id="clearStatusFilter">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Search filter badge (added dynamically) -->
+                    <div id="searchBadge" class="hidden px-3 py-1.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full flex items-center">
+                        <i class="fas fa-search text-blue-600 mr-2"></i>
+                        <span id="searchBadgeText">Search: </span>
+                        <button class="ml-2 focus:outline-none hover:text-blue-800" id="clearSearchFilter">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Clear all filters button -->
+                    <button id="clearAllFilters" class="ml-auto text-sm text-blue-600 hover:text-blue-800 focus:outline-none transition-colors duration-200 flex items-center">
+                        <i class="fas fa-times-circle mr-1.5"></i>
+                        Clear all
+                    </button>
                 </div>
             </div>
             
@@ -185,6 +226,15 @@
         const $searchBox = $('#searchBox');
         const $voterRows = $('.voter-row');
         const $noResultsMessage = $('#noResultsMessage');
+        const $clearSearch = $('#clearSearch');
+        const $activeFilters = $('#activeFilters');
+        const $statusBadge = $('#statusBadge');
+        const $statusBadgeText = $('#statusBadgeText');
+        const $searchBadge = $('#searchBadge');
+        const $searchBadgeText = $('#searchBadgeText');
+        
+        // Initial state check
+        updateFilterVisibility();
         
         function filterVoters() {
             const statusValue = $statusFilter.val() || 'all';
@@ -218,17 +268,81 @@
             } else {
                 $noResultsMessage.addClass('hidden');
             }
+            
+            // Update filter badges
+            updateFilterVisibility();
+        }
+        
+        function updateFilterVisibility() {
+            const statusValue = $statusFilter.val() || 'all';
+            const searchValue = $searchBox.val().toLowerCase();
+            
+            // Update clear search button visibility
+            if (searchValue.length > 0) {
+                $clearSearch.removeClass('hidden');
+            } else {
+                $clearSearch.addClass('hidden');
+            }
+            
+            // Update status badge
+            if (statusValue !== 'all') {
+                $statusBadge.removeClass('hidden');
+                $statusBadgeText.text('Status: ' + statusValue.charAt(0).toUpperCase() + statusValue.slice(1));
+            } else {
+                $statusBadge.addClass('hidden');
+            }
+            
+            // Update search badge
+            if (searchValue.length > 0) {
+                $searchBadge.removeClass('hidden');
+                // Truncate long search values to keep badge concise
+                const truncatedValue = searchValue.length > 15 ? searchValue.substring(0, 15) + '...' : searchValue;
+                $searchBadgeText.text('Search: ' + truncatedValue);
+                // Add title attribute for full value on hover
+                $searchBadgeText.attr('title', searchValue);
+            } else {
+                $searchBadge.addClass('hidden');
+            }
+            
+            // Show/hide active filters section
+            if (statusValue !== 'all' || searchValue.length > 0) {
+                $activeFilters.removeClass('hidden');
+            } else {
+                $activeFilters.addClass('hidden');
+            }
+        }
+        
+        // Clear search field
+        function clearSearch() {
+            $searchBox.val('');
+            $clearSearch.addClass('hidden');
+            filterVoters();
+        }
+        
+        // Reset status filter
+        function clearStatusFilter() {
+            $statusFilter.val('all');
+            filterVoters();
+        }
+        
+        // Clear all filters
+        function clearAllFilters() {
+            clearSearch();
+            clearStatusFilter();
         }
         
         // Add event listeners
         $statusFilter.on('change', filterVoters);
         $searchBox.on('input', filterVoters);
+        $clearSearch.on('click', clearSearch);
+        $('#clearStatusFilter').on('click', clearStatusFilter);
+        $('#clearSearchFilter').on('click', clearSearch);
+        $('#clearAllFilters').on('click', clearAllFilters);
         
-        // Add clear button functionality
+        // Clear search on escape key
         $searchBox.on('keyup', function(e) {
             if (e.key === 'Escape') {
-                $(this).val('');
-                filterVoters();
+                clearSearch();
             }
         });
         
