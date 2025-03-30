@@ -1,0 +1,273 @@
+<%- include('../partials/header', {title: title || 'Admin Dashboard - Democracia Electoral Commission'}) %>
+
+<div class="container mt-4 animate__animated animate__fadeIn">
+  <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 flex items-center">
+        <div class="bg-primary-700 text-white p-2 rounded-lg shadow-md mr-3">
+          <i class="fas fa-tachometer-alt"></i>
+        </div>
+        Admin Dashboard
+      </h1>
+      <p class="text-gray-500 mt-1">Manage voter ID applications and approvals</p>
+    </div>
+    <div>
+      <a href="/admin/logout" class="btn btn-danger flex items-center shadow">
+        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+      </a>
+    </div>
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="stat-card stat-card-primary animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+      <div class="p-5">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-white/80">Total Voters</p>
+            <h2 class="text-3xl font-bold mt-2"><%= totalVoters %></h2>
+          </div>
+          <div class="bg-white/20 p-3 rounded-lg">
+            <i class="fas fa-users text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-white/70 flex items-center">
+            <i class="fas fa-database mr-1"></i> Total registered voters
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-warning animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+      <div class="p-5">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-white/80">Pending</p>
+            <h2 class="text-3xl font-bold mt-2"><%= totalPending %></h2>
+          </div>
+          <div class="bg-white/20 p-3 rounded-lg">
+            <i class="fas fa-clock text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-white/70 flex items-center">
+            <i class="fas fa-spinner mr-1"></i> Awaiting approval
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-success animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
+      <div class="p-5">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-white/80">Approved</p>
+            <h2 class="text-3xl font-bold mt-2"><%= totalApproved %></h2>
+          </div>
+          <div class="bg-white/20 p-3 rounded-lg">
+            <i class="fas fa-check-circle text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-white/70 flex items-center">
+            <i class="fas fa-thumbs-up mr-1"></i> Approved applications
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stat-card stat-card-danger animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
+      <div class="p-5">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-sm font-medium text-white/80">Rejected</p>
+            <h2 class="text-3xl font-bold mt-2"><%= totalRejected %></h2>
+          </div>
+          <div class="bg-white/20 p-3 rounded-lg">
+            <i class="fas fa-times-circle text-2xl"></i>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-white/70 flex items-center">
+            <i class="fas fa-thumbs-down mr-1"></i> Rejected applications
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card shadow-lg mb-8 animate__animated animate__fadeInUp" style="animation-delay: 0.5s">
+    <div class="flex justify-between items-center p-5 border-b border-gray-200">
+      <h3 class="text-lg font-semibold flex items-center text-gray-800">
+        <i class="fas fa-list text-primary-600 mr-2"></i>Voter Applications
+      </h3>
+      <div class="search-box">
+        <div class="search-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <input type="text" id="search-voters" class="search-input" placeholder="Search voters...">
+      </div>
+    </div>
+    <div class="p-0 overflow-x-auto">
+      <table class="admin-table">
+        <thead class="admin-thead">
+          <tr>
+            <th class="admin-th">ID</th>
+            <th class="admin-th">Name</th>
+            <th class="admin-th">Registration ID</th>
+            <th class="admin-th">Date of Birth</th>
+            <th class="admin-th">Status</th>
+            <th class="admin-th">Source</th>
+            <th class="admin-th">Created</th>
+            <th class="admin-th">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% if (voters && voters.length > 0) { %>
+            <% voters.forEach(voter => { %>
+              <tr class="admin-tr">
+                <td class="admin-td font-medium text-gray-700"><%= voter.id %></td>
+                <td class="admin-td font-medium text-gray-900"><%= voter.first_name %> <%= voter.last_name %></td>
+                <td class="admin-td font-mono"><%= voter.registration_id %></td>
+                <td class="admin-td"><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : 'N/A' %></td>
+                <td class="admin-td">
+                  <% if (voter.status === 'pending') { %>
+                    <span class="status-badge status-badge-pending">
+                      <i class="fas fa-clock mr-1"></i>Pending
+                    </span>
+                  <% } else if (voter.status === 'approved') { %>
+                    <span class="status-badge status-badge-approved">
+                      <i class="fas fa-check mr-1"></i>Approved
+                    </span>
+                  <% } else if (voter.status === 'rejected') { %>
+                    <span class="status-badge status-badge-rejected">
+                      <i class="fas fa-times mr-1"></i>Rejected
+                    </span>
+                  <% } else { %>
+                    <span class="status-badge bg-gray-100 text-gray-800">
+                      <%= voter.status %>
+                    </span>
+                  <% } %>
+                </td>
+                <td class="admin-td">
+                  <% if (typeof voter.source !== 'undefined') { %>
+                    <% if (voter.source === 'manual_application') { %>
+                      <span class="status-badge bg-info-100 text-info-800">
+                        <i class="fas fa-keyboard mr-1"></i>Manual
+                      </span>
+                    <% } else if (voter.source === 'subsafe_notification') { %>
+                      <span class="status-badge bg-primary-100 text-primary-800">
+                        <i class="fas fa-shield-alt mr-1"></i>System
+                      </span>
+                    <% } else { %>
+                      <span class="status-badge bg-gray-100 text-gray-800">
+                        <%= voter.source || 'Unknown' %>
+                      </span>
+                    <% } %>
+                  <% } else { %>
+                    <span class="status-badge bg-gray-100 text-gray-800">
+                      Unknown
+                    </span>
+                  <% } %>
+                </td>
+                <td class="admin-td"><%= new Date(voter.created_at).toLocaleDateString() %></td>
+                <td class="admin-td">
+                  <div class="flex space-x-2">
+                    <a href="/admin/voter/<%= voter.registration_id %>" class="btn btn-sm btn-outline text-primary-700 border-primary-300 hover:bg-primary-50">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <% if (voter.status === 'pending') { %>
+                      <form action="/admin/approve/<%= voter.registration_id %>" method="POST" class="inline">
+                        <button type="submit" class="btn btn-sm btn-outline text-success-700 border-success-300 hover:bg-success-50">
+                          <i class="fas fa-check"></i>
+                        </button>
+                      </form>
+                      <form action="/admin/reject/<%= voter.registration_id %>" method="POST" class="inline">
+                        <button type="submit" class="btn btn-sm btn-outline text-danger-700 border-danger-300 hover:bg-danger-50">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </form>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="8" class="px-6 py-10 text-center text-gray-500">
+                <div class="flex flex-col items-center">
+                  <i class="fas fa-inbox text-gray-400 text-4xl mb-3"></i>
+                  <p>No voter records found</p>
+                </div>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+    <div class="bg-gray-50 px-5 py-4 border-t border-gray-200">
+      <nav class="flex justify-center">
+        <ul class="flex space-x-1">
+          <% if (pagination.hasPrev) { %>
+            <li>
+              <a href="/admin/dashboard?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>" class="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+                <i class="fas fa-chevron-left text-xs mr-1"></i>Previous
+              </a>
+            </li>
+          <% } else { %>
+            <li>
+              <span class="px-3 py-2 bg-gray-100 text-gray-400 border border-gray-200 rounded-md cursor-not-allowed">
+                <i class="fas fa-chevron-left text-xs mr-1"></i>Previous
+              </span>
+            </li>
+          <% } %>
+          
+          <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+            <li>
+              <a href="/admin/dashboard?page=<%= i %>&limit=<%= pagination.limit %>" 
+                class="px-3 py-2 <%= pagination.page === i 
+                  ? 'bg-primary-600 text-white border border-primary-600' 
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' %> rounded-md">
+                <%= i %>
+              </a>
+            </li>
+          <% } %>
+          
+          <% if (pagination.hasNext) { %>
+            <li>
+              <a href="/admin/dashboard?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>" class="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+                Next<i class="fas fa-chevron-right text-xs ml-1"></i>
+              </a>
+            </li>
+          <% } else { %>
+            <li>
+              <span class="px-3 py-2 bg-gray-100 text-gray-400 border border-gray-200 rounded-md cursor-not-allowed">
+                Next<i class="fas fa-chevron-right text-xs ml-1"></i>
+              </span>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add search functionality
+  document.getElementById('search-voters').addEventListener('keyup', function() {
+    const searchText = this.value.toLowerCase();
+    const table = document.querySelector('table');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(searchText)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %> 

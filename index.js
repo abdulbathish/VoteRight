@@ -17,6 +17,12 @@ const expressLayouts = require('express-ejs-layouts');
 const SubSafe = require('subsafe');
 const logger = console;
 
+// Import database models and services
+const { testConnection, sequelize } = require('./src/config/database');
+const { syncModels } = require('./src/models');
+const dbService = require('./src/services/dbService');
+const { fixDatabase } = require('./src/utils/dbFix');
+
 // Initialize express app
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +48,12 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.set('layout', 'layout');
+
+// Path middleware - Add currentPath to all templates
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path;
+  next();
+});
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -81,9 +93,6 @@ if (!fs.existsSync(tempDecryptedFile)) {
   fs.writeFileSync(tempDecryptedFile, '');
 }
 
-// In-memory database for voter data (in a real app, use a proper database)
-const voterDatabase = [];
-
 // Initialize SubSafe for WebSub subscription and decryption with DST-DEV configuration
 const subsafe = new SubSafe({
   // Server configuration 
@@ -120,7 +129,7 @@ const subsafe = new SubSafe({
 });
 
 // Register notification handler for incoming messages
-subsafe.onNotification((data, rawEvent) => {
+subsafe.onNotification(async (data, rawEvent) => {
   logger.info('Event received - DataShare Mode');
   
   if (data && data.error) {
@@ -129,111 +138,66 @@ subsafe.onNotification((data, rawEvent) => {
   }
   
   logger.info('Message successfully received and decrypted');
-  logger.info('Decrypted data:', data);
   
-  // Extract voter information from the data
+  // Process and store voter information in database
   try {
-    // Check if data has registrationId (either directly or in credentialSubject)
-    const registrationId = data.registrationId || 
-                         (data.credentialSubject && data.credentialSubject.UIN) || 
-                         (data.credentialSubject && data.credentialSubject.id);
-    
-    if (registrationId) {
-      logger.info(`Processing registration ID: ${registrationId}`);
-      
-      // Extract credentialSubject if it exists
-      const subject = data.credentialSubject || data;
-      
-      // Get name fields - handling both array and direct string values
-      let firstName = '';
-      if (subject.firstName) {
-        firstName = Array.isArray(subject.firstName) ? 
-                   (subject.firstName[0] && subject.firstName[0].value ? subject.firstName[0].value : '') : 
-                   subject.firstName;
-      }
-      
-      let lastName = '';
-      if (subject.lastName) {
-        lastName = Array.isArray(subject.lastName) ? 
-                  (subject.lastName[0] && subject.lastName[0].value ? subject.lastName[0].value : '') : 
-                  subject.lastName;
-      }
-      
-      // Get address fields - handling both array and direct string values
-      let address = '';
-      if (subject.addressLine1) {
-        const addressLine1 = Array.isArray(subject.addressLine1) ? 
-                           (subject.addressLine1[0] && subject.addressLine1[0].value ? subject.addressLine1[0].value : '') : 
-                           subject.addressLine1;
-        
-        const addressLine2 = subject.addressLine2 ? 
-                           (Array.isArray(subject.addressLine2) ? 
-                            (subject.addressLine2[0] && subject.addressLine2[0].value ? subject.addressLine2[0].value : '') : 
-                            subject.addressLine2) : 
-                           '';
-        
-        const city = subject.city ? 
-                    (Array.isArray(subject.city) ? 
-                     (subject.city[0] && subject.city[0].value ? subject.city[0].value : '') : 
-                     subject.city) : 
-                    '';
-        
-        address = [addressLine1, addressLine2, city, subject.postalCode].filter(Boolean).join(', ');
-      }
-      
-      // Get date of birth and calculate age
-      const dob = subject.dob || subject.dateOfBirth;
-      if (!dob) {
-        logger.info(`Skipping registration ID ${registrationId} - No date of birth found`);
-        return;
-      }
-      
-      const dobDate = new Date(dob);
-      const today = new Date();
-      let age = today.getFullYear() - dobDate.getFullYear();
-      const monthDiff = today.getMonth() - dobDate.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
-        age--;
-      }
-
-      // Check if person meets the minimum age requirement
-      const minAge = parseInt(process.env.MIN_VOTER_AGE) || 18;
-      if (minAge > 0 && age < minAge) {
-        logger.info(`Skipping registration ID ${registrationId} - Person is under minimum age of ${minAge} (${age} years old)`);
-        return;
-      }
-
-      // Create voter record with received data
-      const voter = {
-        id: `VID-${uuidv4().substring(0, 8).toUpperCase()}`,
-        firstName: firstName,
-        lastName: lastName,
-        dob: dob,
-        address: address,
-        idNumber: subject.idNumber || subject.UIN || '',
-        registrationId: registrationId,
-        phone: subject.phone || subject.phoneNumber || '',
-        email: subject.email || '',
-        photoPath: subject.photoPath || null,
-        status: 'pending',
-        createdAt: new Date(),
-        hash: CryptoJS.SHA256(`${registrationId}${dob}`).toString(),
-        rawData: data // Store the complete data for reference
-      };
-      
-      // Save to database
-      const existingIndex = voterDatabase.findIndex(v => v.id === voter.id);
-      if (existingIndex >= 0) {
-        logger.info(`Updating existing record for registration ID: ${registrationId}`);
-        voterDatabase[existingIndex] = voter;
+    // Check if registrationId exists in the data
+    if (!data.registrationId) {
+      // Try to extract registration ID from other available fields
+      if (data.credentialSubject && data.credentialSubject.UIN) {
+        data.registrationId = data.credentialSubject.UIN;
+      } else if (data.UIN) {
+        data.registrationId = data.UIN;
+      } else if (data.id) {
+        data.registrationId = data.id;
+      } else if (data.credentialSubject && data.credentialSubject.id) {
+        data.registrationId = data.credentialSubject.id;
       } else {
-        logger.info(`Adding new record for registration ID: ${registrationId}`);
-        voterDatabase.push(voter);
+        // Generate a unique ID as a last resort
+        data.registrationId = `RID-${uuidv4()}`;
+        logger.info(`Generated registration ID: ${data.registrationId} as none was found in the data`);
       }
     }
+    
+    // Add source information
+    data.source = 'subsafe_notification';
+    
+    // Add empty values for required fields if they don't exist to prevent database errors
+    if (!data.email) data.email = null;
+    if (!data.phone) data.phone = null;
+    
+    // Log data structure for debugging
+    logger.debug('Processing data with mapping:', {
+      registrationId: data.registrationId,
+      hasCredentialSubject: !!data.credentialSubject,
+      source: data.source
+    });
+    
+    // Save voter data to database using the mapping configuration
+    const savedVoter = await dbService.saveVoterData(data);
+    logger.info('Voter data saved to database:', { 
+      registration_id: savedVoter.registration_id,
+      name: `${savedVoter.first_name || ''} ${savedVoter.last_name || ''}`.trim(),
+      source: savedVoter.source
+    });
   } catch (error) {
-    logger.error('Error processing notification data:', error);
+    logger.error('Error saving voter data from SubSafe notification:', error.message);
+    
+    // Log detailed error information
+    if (error.name === 'SequelizeDatabaseError') {
+      logger.error('Database error details:', { 
+        message: error.message,
+        sql: error.sql?.substring(0, 100) + '...',
+        code: error.parent?.code
+      });
+    }
+    
+    // Log the data structure to help with debugging
+    logger.debug('Data structure that caused the error:', {
+      data_keys: Object.keys(data),
+      registration_id: data.registrationId,
+      has_credential_subject: !!data.credentialSubject
+    });
   }
 });
 
@@ -281,57 +245,141 @@ app.get('/apply', (req, res) => {
   res.render('apply', { title: 'Apply for Voter ID - Democracia' });
 });
 
-app.post('/apply', upload.single('photo'), validateAge, (req, res) => {
-  const { firstName, lastName, dob, address, idNumber, phone, email } = req.body;
-  const photoPath = req.file ? req.file.path : null;
-  
-  // Generate unique voter ID
-  const voterId = `VID-${uuidv4().substring(0, 8).toUpperCase()}`;
-  
-  // Create voter record
-  const voter = {
-    id: voterId,
-    firstName,
-    lastName,
-    dob,
-    address,
-    idNumber,
-    registrationId: idNumber, // Store RID separately for searching
-    phone,
-    email,
-    photoPath,
-    status: 'pending',
-    createdAt: new Date(),
-    hash: CryptoJS.SHA256(`${firstName}${lastName}${dob}${idNumber}`).toString()
-  };
-  
-  // Save to database
-  voterDatabase.push(voter);
-  
-  // Redirect to confirmation page
-  res.render('confirmation', { voter, title: 'Application Submitted - Democracia' });
+app.post('/apply', upload.single('photo'), validateAge, async (req, res) => {
+  try {
+    // Extract all form fields
+    console.log('Full request body:', req.body);
+    const { firstName, lastName, dob, gender, addressLine1, addressLine2, city, postalCode, phone, email } = req.body;
+    const photoPath = req.file ? req.file.path : null;
+    
+    // Generate unique voter ID and registration ID
+    const voterId = `VID-${uuidv4().substring(0, 8).toUpperCase()}`;
+    const registrationId = `MAN-${Date.now()}-${uuidv4().substring(0, 6).toUpperCase()}`;
+    
+    // Log the received form data for debugging
+    logger.debug('Manual application form data received:', { 
+      firstName, lastName, dob, gender, addressLine1, addressLine2, city, postalCode, phone, email, photoPath 
+    });
+    
+    // Create voter record - keep all field names in both formats to ensure compatibility
+    const voter = {
+      // Basic info
+      registrationId: registrationId,
+      registration_id: registrationId,
+      
+      // Name
+      firstName: firstName,
+      first_name: firstName,
+      lastName: lastName,
+      last_name: lastName,
+      
+      // Identity
+      gender: gender,
+      dob: dob,
+      date_of_birth: dob,
+      
+      // Address
+      addressLine1: addressLine1,
+      address_line1: addressLine1,
+      addressLine2: addressLine2 || null,
+      address_line2: addressLine2 || null,
+      city: city,
+      postalCode: postalCode,
+      postal_code: postalCode,
+      
+      // Contact
+      email: email || null,
+      phone: phone || null,
+      
+      // Photo
+      photo: photoPath,
+      photoPath: photoPath,
+      
+      // Status
+      status: 'pending',
+      source: 'manual_application',
+      
+      // Timestamps
+      created_at: new Date(),
+      updated_at: new Date(),
+      
+      // Hash for duplicate detection
+      hash: CryptoJS.SHA256(`${firstName}${lastName}${dob}`).toString(),
+      
+      // Voter ID
+      voter_id: voterId,
+      voterId: voterId
+    };
+    
+    // Save to database
+    logger.info('Saving voter data from manual application', { 
+      registration_id: registrationId,
+      first_name: firstName,
+      last_name: lastName
+    });
+    
+    const savedVoter = await dbService.saveVoterData(voter);
+    
+    // Redirect to confirmation page
+    res.render('confirmation', { 
+      voter: savedVoter, 
+      title: 'Application Submitted - Democracia' 
+    });
+  } catch (error) {
+    logger.error('Error saving voter data from manual application:', error.message);
+    res.render('apply', { 
+      error: 'There was an error processing your application. Please try again.',
+      title: 'Apply for Voter ID - Democracia'
+    });
+  }
 });
 
 app.get('/status', (req, res) => {
   res.render('status', { title: 'Check Application Status - Democracia' });
 });
 
-app.post('/status', (req, res) => {
+app.post('/status', async (req, res) => {
   const { rid, email } = req.body;
   
-  // Find voter by RID and email only
-  const voter = voterDatabase.find(v => 
-    (v.idNumber === rid || v.registrationId === rid) && 
-    v.email === email
-  );
-  
-  if (voter) {
-    res.render('status-result', { voter, title: 'Application Status - Democracia' });
-  } else {
+  try {
+    // Find voter by RID only, not using email/phone to avoid database errors
+    let whereClause = {
+      registration_id: rid
+    };
+    
+    // Email/phone filtering will be done in memory instead of database
+    const voter = await sequelize.models.Voter.findOne({ 
+      where: whereClause
+    });
+    
+    if (voter) {
+      // Check if the email/phone matches (if voter has these fields)
+      const matchesEmail = !email || 
+                          (voter.email && email.includes('@') && voter.email === email) || 
+                          (voter.phone && !email.includes('@') && voter.phone === email);
+      
+      if (matchesEmail) {
+        res.render('status-result', { voter, title: 'Application Status - Democracia' });
+      } else {
+        res.render('status', { 
+          error: 'No matching record found. Please check your RID and email/phone and try again.',
+          rid: rid,
+          email: email,
+          title: 'Check Application Status - Democracia' 
+        });
+      }
+    } else {
+      res.render('status', { 
+        error: 'No matching record found. Please check your RID and email/phone and try again.',
+        rid: rid,
+        email: email,
+        title: 'Check Application Status - Democracia' 
+      });
+    }
+  } catch (error) {
+    logger.error('Error retrieving voter status:', error.message);
     res.render('status', { 
-      error: 'No matching record found. Please check your RID and email and try again.',
-      rid: rid,
-      email: email,
+      error: 'Error retrieving application status. Please try again later.',
       title: 'Check Application Status - Democracia' 
     });
   }
@@ -339,7 +387,7 @@ app.post('/status', (req, res) => {
 
 // Admin routes
 app.get('/admin/login', (req, res) => {
-  res.render('admin-login', { title: 'Admin Login - Democracia Electoral Commission' });
+  res.render('admin/login', { title: 'Admin Login - Democracia Electoral Commission' });
 });
 
 app.post('/admin/login', (req, res) => {
@@ -351,112 +399,135 @@ app.post('/admin/login', (req, res) => {
     req.session.isAdmin = true;
     res.redirect('/admin/dashboard');
   } else {
-    res.render('admin-login', { error: 'Invalid credentials', title: 'Admin Login - Democracia Electoral Commission' });
+    res.render('admin/login', { error: 'Invalid credentials', title: 'Admin Login - Democracia Electoral Commission' });
   }
 });
 
-app.get('/admin/dashboard', isAdminLoggedIn, (req, res) => {
-  // Pagination parameters
-  const page = parseInt(req.query.page) || 1; // Current page (default: 1)
-  const limit = parseInt(req.query.limit) || 10; // Records per page (default: 10)
-  
-  // Filtering parameters
-  const statusFilter = req.query.status || 'all';
-  const searchQuery = req.query.search || '';
-  
-  // Apply filters to get filtered data
-  let filteredVoters = [...voterDatabase];
-  
-  // Apply status filter
-  if (statusFilter !== 'all') {
-    filteredVoters = filteredVoters.filter(voter => voter.status === statusFilter);
+app.get('/admin/dashboard', isAdminLoggedIn, async (req, res) => {
+  try {
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1; // Current page (default: 1)
+    const limit = parseInt(req.query.limit) || 10; // Records per page (default: 10)
+    const offset = (page - 1) * limit;
+    
+    // Get voters with pagination
+    const voters = await dbService.getAllVoters({ limit, offset });
+    const count = await sequelize.models.Voter.count();
+    
+    // Get counts for different statuses
+    const approvedCount = await sequelize.models.Voter.count({ where: { status: 'approved' } });
+    const pendingCount = await sequelize.models.Voter.count({ where: { status: 'pending' } });  
+    const rejectedCount = await sequelize.models.Voter.count({ where: { status: 'rejected' } });
+    
+    res.render('admin/dashboard', { 
+      voters, 
+      totalVoters: count,
+      totalApproved: approvedCount,
+      totalPending: pendingCount,
+      totalRejected: rejectedCount,
+      filteredCount: voters.length,
+      pagination: {
+        page,
+        limit,
+        totalPages: Math.ceil(count / limit),
+        hasNext: page < Math.ceil(count / limit),
+        hasPrev: page > 1
+      },
+      title: 'Admin Dashboard - Democracia Electoral Commission' 
+    });
+  } catch (error) {
+    console.error('Error fetching voters for dashboard:', error);
+    res.status(500).render('error', { 
+      message: 'Failed to retrieve voter list',
+      error: { status: 500, stack: process.env.NODE_ENV === 'development' ? error.stack : '' } 
+    });
   }
-  
-  // Apply search filter (case-insensitive search on first name, last name, and ID)
-  if (searchQuery) {
-    const searchLower = searchQuery.toLowerCase();
-    filteredVoters = filteredVoters.filter(voter => 
-      voter.firstName.toLowerCase().includes(searchLower) || 
-      voter.lastName.toLowerCase().includes(searchLower) || 
-      voter.id.toLowerCase().includes(searchLower) ||
-      (voter.idNumber && voter.idNumber.toLowerCase().includes(searchLower))
-    );
-  }
-  
-  // Calculate pagination
-  const totalRecords = filteredVoters.length;
-  const totalPages = Math.ceil(totalRecords / limit);
-  const skip = (page - 1) * limit; // Calculate records to skip
-  
-  // Get records for current page
-  const paginatedVoters = filteredVoters.slice(skip, skip + limit);
-  
-  res.render('admin-dashboard', { 
-    voters: paginatedVoters, 
-    totalVoters: voterDatabase.length,
-    totalApproved: voterDatabase.filter(voter => voter.status === 'approved').length,
-    totalPending: voterDatabase.filter(voter => voter.status === 'pending').length,
-    totalRejected: voterDatabase.filter(voter => voter.status === 'rejected').length,
-    filteredCount: filteredVoters.length,
-    filters: {
-      status: statusFilter,
-      search: searchQuery
-    },
-    pagination: {
-      page,
-      limit,
-      totalPages,
-      hasNext: page < totalPages,
-      hasPrev: page > 1
-    },
-    title: 'Admin Dashboard - Democracia Electoral Commission' 
-  });
 });
 
 // Individual voter details page
-app.get('/admin/voter/:id', isAdminLoggedIn, (req, res) => {
-  const { id } = req.params;
-  const voter = voterDatabase.find(v => v.id === id);
-  
-  if (!voter) {
-    return res.status(404).render('error', { 
-      message: 'Voter not found', 
-      title: 'Error - Democracia Electoral Commission'
+app.get('/admin/voter/:id', isAdminLoggedIn, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const voter = await dbService.getVoterByRegistrationId(id);
+    
+    if (!voter) {
+      return res.status(404).render('error', { 
+        message: 'Voter not found', 
+        title: 'Error - Democracia Electoral Commission'
+      });
+    }
+    
+    res.render('admin/voter-detail', { 
+      voter, 
+      title: `Voter Details: ${voter.first_name} ${voter.last_name} - Democracia Electoral Commission` 
+    });
+  } catch (error) {
+    console.error('Error fetching voter details:', error);
+    res.status(500).render('error', { 
+      message: 'Failed to retrieve voter details',
+      error: { status: 500, stack: process.env.NODE_ENV === 'development' ? error.stack : '' } 
     });
   }
-  
-  res.render('admin-voter-detail', { 
-    voter, 
-    title: `Voter Details: ${voter.firstName} ${voter.lastName} - Democracia Electoral Commission` 
-  });
 });
 
-app.post('/admin/approve/:id', isAdminLoggedIn, (req, res) => {
-  const { id } = req.params;
-  const voterIndex = voterDatabase.findIndex(v => v.id === id);
-  
-  if (voterIndex !== -1) {
-    voterDatabase[voterIndex].status = 'approved';
-    voterDatabase[voterIndex].approvedAt = new Date();
+app.post('/admin/approve/:id', isAdminLoggedIn, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get the voter
+    const voter = await dbService.getVoterByRegistrationId(id);
+    
+    if (voter) {
+      // Update status to approved
+      await sequelize.models.Voter.update(
+        { 
+          status: 'approved',
+          updated_at: new Date()
+        },
+        { where: { registration_id: id } }
+      );
+    }
+    
+    // Check if a redirect URL is specified
+    const returnTo = req.query.returnTo || '/admin/dashboard';
+    res.redirect(returnTo);
+  } catch (error) {
+    console.error('Error approving voter:', error);
+    res.status(500).render('error', { 
+      message: 'Failed to approve voter',
+      error: { status: 500, stack: process.env.NODE_ENV === 'development' ? error.stack : '' } 
+    });
   }
-  
-  // Check if a redirect URL is specified
-  const returnTo = req.query.returnTo || '/admin/dashboard';
-  res.redirect(returnTo);
 });
 
-app.post('/admin/reject/:id', isAdminLoggedIn, (req, res) => {
-  const { id } = req.params;
-  const voterIndex = voterDatabase.findIndex(v => v.id === id);
-  
-  if (voterIndex !== -1) {
-    voterDatabase[voterIndex].status = 'rejected';
-    voterDatabase[voterIndex].rejectedAt = new Date();
+app.post('/admin/reject/:id', isAdminLoggedIn, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Get the voter
+    const voter = await dbService.getVoterByRegistrationId(id);
+    
+    if (voter) {
+      // Update status to rejected
+      await sequelize.models.Voter.update(
+        { 
+          status: 'rejected',
+          updated_at: new Date()
+        },
+        { where: { registration_id: id } }
+      );
+    }
+    
+    // Check if a redirect URL is specified
+    const returnTo = req.query.returnTo || '/admin/dashboard';
+    res.redirect(returnTo);
+  } catch (error) {
+    console.error('Error rejecting voter:', error);
+    res.status(500).render('error', { 
+      message: 'Failed to reject voter',
+      error: { status: 500, stack: process.env.NODE_ENV === 'development' ? error.stack : '' } 
+    });
   }
-  
-  // Check if a redirect URL is specified
-  const returnTo = req.query.returnTo || '/admin/dashboard';
-  res.redirect(returnTo);
 });
 
 app.get('/admin/logout', (req, res) => {
@@ -465,53 +536,104 @@ app.get('/admin/logout', (req, res) => {
 });
 
 // API for voter card generation
-app.get('/api/voter-card/:id', (req, res) => {
-  const { id } = req.params;
-  const voter = voterDatabase.find(v => v.id === id);
-  
-  if (!voter) {
-    return res.status(404).json({ error: 'Voter not found' });
+app.get('/api/voter-card/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const voter = await dbService.getVoterByRegistrationId(id);
+    
+    if (!voter) {
+      return res.status(404).json({ error: 'Voter not found' });
+    }
+    
+    if (voter.status !== 'approved') {
+      return res.status(403).json({ error: 'Voter ID not approved yet' });
+    }
+    
+    // Return voter card data
+    res.json({
+      id: voter.registration_id,
+      name: `${voter.first_name} ${voter.last_name}`,
+      dob: voter.date_of_birth,
+      issueDate: voter.issue_date,
+      expiryDate: voter.expiry_date,
+      voter_id: voter.voter_id
+    });
+  } catch (error) {
+    console.error('Error generating voter card data:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-  
-  if (voter.status !== 'approved') {
-    return res.status(403).json({ error: 'Voter ID not approved yet' });
-  }
-  
-  // Return voter card data (in a real app, generate a PDF or card image)
-  res.json({
-    id: voter.id,
-    name: `${voter.firstName} ${voter.lastName}`,
-    dob: voter.dob,
-    issueDate: voter.approvedAt,
-    expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 10)),
-    hash: voter.hash
-  });
 });
 
 // Route to view voter ID card
-app.get('/voter-card/:id', (req, res) => {
-  const { id } = req.params;
-  const voter = voterDatabase.find(v => v.id === id);
-  
-  if (!voter) {
-    return res.status(404).render('error', { 
-      message: 'Voter ID not found',
-      title: 'Error - Democracia Voter ID System'
+app.get('/voter-card/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const voter = await dbService.getVoterByRegistrationId(id);
+    
+    if (!voter) {
+      return res.status(404).render('error', { 
+        message: 'Voter ID not found',
+        title: 'Error - Democracia Voter ID System'
+      });
+    }
+    
+    if (voter.status !== 'approved') {
+      return res.status(403).render('error', { 
+        message: 'Voter ID not approved yet',
+        title: 'Error - Democracia Voter ID System'
+      });
+    }
+    
+    res.render('voter-card', { 
+      voter,
+      title: 'Voter ID Card - Democracia Electoral Commission',
+      expiryDate: voter.expiry_date
+    });
+  } catch (error) {
+    console.error('Error displaying voter card:', error);
+    res.status(500).render('error', { 
+      message: 'Failed to retrieve voter card',
+      error: { status: 500, stack: process.env.NODE_ENV === 'development' ? error.stack : '' } 
     });
   }
-  
-  if (voter.status !== 'approved') {
-    return res.status(403).render('error', { 
-      message: 'Voter ID not approved yet',
-      title: 'Error - Democracia Voter ID System'
-    });
-  }
-  
-  res.render('voter-card', { 
-    voter,
-    title: 'Voter ID Card - Democracia Electoral Commission',
-    expiryDate: new Date(new Date(voter.approvedAt).setFullYear(new Date(voter.approvedAt).getFullYear() + 10))
+});
+
+// Handle base voter-card route without ID
+app.get('/voter-card', (req, res) => {
+  res.status(400).render('error', { 
+    message: 'Voter ID not provided in the URL',
+    title: 'Error - Democracia Voter ID System'
   });
+});
+
+// Admin - Voter List (redirecting to dashboard for consistency)
+app.get('/admin/voters', isAdminLoggedIn, (req, res) => {
+  res.redirect('/admin/dashboard');
+});
+
+// Admin - View Voter
+app.get('/admin/voters/:id', isAdminLoggedIn, async (req, res) => {
+  try {
+    const voter = await dbService.getVoterByRegistrationId(req.params.id);
+    
+    if (!voter) {
+      return res.status(404).render('error', { 
+        message: 'Voter not found',
+        error: { status: 404, stack: '' } 
+      });
+    }
+    
+    res.render('admin/voter-detail', { 
+      voter,
+      title: `Voter Details: ${voter.first_name} ${voter.last_name} - Democracia Electoral Commission`
+    });
+  } catch (error) {
+    logger.error('Error fetching voter details:', error);
+    res.status(500).render('error', { 
+      message: 'Failed to retrieve voter details',
+      error: { status: 500, stack: process.env.NODE_ENV === 'development' ? error.stack : '' } 
+    });
+  }
 });
 
 // Create uploads directory if it doesn't exist
@@ -530,9 +652,91 @@ let expressServer;
 // Start main application and WebSub subscriber
 const startApp = async () => {
   try {
+    // Test database connection
+    const dbConnected = await testConnection();
+    
+    if (!dbConnected) {
+      logger.error('Database connection failed. Exiting application.');
+      process.exit(1);
+    }
+    
+    // Run database fix utility to address schema issues
+    logger.info('Running database schema fixes...');
+    await fixDatabase();
+    
+    // Sync database models without force to preserve existing data
+    logger.info('Synchronizing database models with force=false');
+    await syncModels(false); // Set to false to avoid dropping tables
+    
+    // Add missing columns directly using SQL
+    try {
+      logger.info('Checking if the voters table exists...');
+      const tableExists = await sequelize.query(
+        "SELECT to_regclass('public.voters') as exists",
+        { type: sequelize.QueryTypes.SELECT }
+      );
+      
+      if (!tableExists[0].exists) {
+        logger.error('Voters table does not exist in the database, creating it now...');
+        // Create the table with the basic structure
+        await sequelize.query(`
+          CREATE TABLE IF NOT EXISTS voters (
+            id SERIAL PRIMARY KEY,
+            registration_id VARCHAR(255) NOT NULL UNIQUE,
+            first_name VARCHAR(255) NOT NULL,
+            last_name VARCHAR(255),
+            date_of_birth DATE,
+            uin VARCHAR(255),
+            voter_id VARCHAR(255),
+            gender VARCHAR(255),
+            address_line1 VARCHAR(255),
+            address_line2 VARCHAR(255),
+            city VARCHAR(255),
+            postal_code VARCHAR(255),
+            email VARCHAR(255),
+            phone VARCHAR(255),
+            photo TEXT,
+            source VARCHAR(255) DEFAULT 'manual',
+            status VARCHAR(50) DEFAULT 'pending',
+            issue_date TIMESTAMP,
+            expiry_date TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          );
+        `);
+        logger.info('Voters table created successfully');
+      } else {
+        // Check and add missing columns
+        logger.info('Checking for missing columns and adding them...');
+        const columns = ['email', 'phone', 'source'];
+        
+        for (const column of columns) {
+          try {
+            // Check if column exists
+            const columnExists = await sequelize.query(
+              `SELECT column_name FROM information_schema.columns 
+               WHERE table_name = 'voters' AND column_name = '${column}'`,
+              { type: sequelize.QueryTypes.SELECT }
+            );
+            
+            if (columnExists.length === 0) {
+              // Add the missing column
+              logger.info(`Adding missing column: ${column}`);
+              let dataType = column === 'source' ? 'VARCHAR(255) DEFAULT \'manual\'' : 'VARCHAR(255)';
+              await sequelize.query(`ALTER TABLE voters ADD COLUMN IF NOT EXISTS ${column} ${dataType};`);
+            }
+          } catch (columnError) {
+            logger.error(`Error checking/adding column ${column}:`, columnError.message);
+          }
+        }
+      }
+    } catch (schemaUpdateError) {
+      logger.error('Error updating database schema:', schemaUpdateError.message);
+    }
+    
     // Start the Express server for the web application
     expressServer = app.listen(PORT, () => {
-      logger.info(`Voter ID Card Issuer running on http://localhost:${PORT}`);
+      logger.info(`Voter ID Card Issuer app listening on port ${PORT}`);
     });
 
     // Start SubSafe server for WebSub subscription
@@ -553,6 +757,7 @@ const startApp = async () => {
     }
   } catch (error) {
     logger.error('Server start error:', error);
+    process.exit(1);
   }
 };
 
@@ -567,8 +772,13 @@ const shutdown = async () => {
   }
   
   try {
-    await subsafe.stop();
-    logger.info('SubSafe server stopped');
+    // Close database connection
+    await sequelize.close();
+    logger.info('Database connection closed');
+    
+    // Unsubscribe from WebSub
+    await subsafe.unsubscribe();
+    logger.info('Unsubscribed from WebSub topic');
   } catch (error) {
     logger.error('Error stopping SubSafe server:', error);
   }

@@ -1,0 +1,186 @@
+<%- include('../partials/header', {title: title || 'Voter Details - Democracia Electoral Commission'}) %>
+
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="h3">
+        <a href="/admin/dashboard" class="text-decoration-none text-muted me-2">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        Voter Details
+      </h1>
+      <p class="text-muted">View and manage voter information</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <% if (voter.status === 'pending') { %>
+        <div class="btn-group">
+          <form action="/admin/approve/<%= voter.registration_id %>?returnTo=/admin/voter/<%= voter.registration_id %>" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-success me-2">
+              <i class="fas fa-check me-1"></i>Approve
+            </button>
+          </form>
+          <form action="/admin/reject/<%= voter.registration_id %>?returnTo=/admin/voter/<%= voter.registration_id %>" method="POST" class="d-inline">
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-times me-1"></i>Reject
+            </button>
+          </form>
+        </div>
+      <% } else if (voter.status === 'approved') { %>
+        <span class="badge bg-success fs-6 py-2 px-3">
+          <i class="fas fa-check-circle me-1"></i>Approved
+        </span>
+      <% } else if (voter.status === 'rejected') { %>
+        <span class="badge bg-danger fs-6 py-2 px-3">
+          <i class="fas fa-times-circle me-1"></i>Rejected
+        </span>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <% if (voter.photo) { %>
+              <img src="<%= voter.photo.startsWith('{') ? '/images/user-placeholder.png' : voter.photo %>" 
+                   alt="Voter Photo" class="img-fluid rounded mb-3" style="max-width: 200px;">
+            <% } else { %>
+              <img src="/images/user-placeholder.png" alt="No Photo" class="img-fluid rounded mb-3" style="max-width: 200px;">
+            <% } %>
+            <h4><%= voter.first_name %> <%= voter.last_name %></h4>
+            <% if (voter.voter_id) { %>
+              <p class="voter-id mb-0"><%= voter.voter_id %></p>
+            <% } %>
+          </div>
+          
+          <table class="table table-borderless">
+            <tr>
+              <th scope="row">Registration ID:</th>
+              <td><%= voter.registration_id %></td>
+            </tr>
+            <tr>
+              <th scope="row">UIN:</th>
+              <td><%= voter.uin || 'N/A' %></td>
+            </tr>
+            <tr>
+              <th scope="row">Date of Birth:</th>
+              <td><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : 'N/A' %></td>
+            </tr>
+            <tr>
+              <th scope="row">Gender:</th>
+              <td><%= voter.gender || 'N/A' %></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-address-card me-2"></i>Address & Contact Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="fw-bold">Address</h6>
+              <p>
+                <%= voter.address_line1 || 'N/A' %><br>
+                <%= voter.address_line2 ? voter.address_line2 + '<br>' : '' %>
+                <%= voter.city ? voter.city + ', ' : '' %>
+                <%= voter.postal_code || '' %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Voter ID Card Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <table class="table table-borderless">
+                <tr>
+                  <th scope="row">Issue Date:</th>
+                  <td><%= voter.issue_date ? new Date(voter.issue_date).toLocaleDateString() : 'Not issued yet' %></td>
+                </tr>
+                <tr>
+                  <th scope="row">Expiry Date:</th>
+                  <td><%= voter.expiry_date ? new Date(voter.expiry_date).toLocaleDateString() : 'Not applicable' %></td>
+                </tr>
+                <tr>
+                  <th scope="row">Status:</th>
+                  <td>
+                    <% if (voter.status === 'pending') { %>
+                      <span class="badge bg-warning text-dark">Pending</span>
+                    <% } else if (voter.status === 'approved') { %>
+                      <span class="badge bg-success">Approved</span>
+                    <% } else if (voter.status === 'rejected') { %>
+                      <span class="badge bg-danger">Rejected</span>
+                    <% } else { %>
+                      <span class="badge bg-secondary"><%= voter.status %></span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Source:</th>
+                  <td>
+                    <% if (voter.source === 'manual_application') { %>
+                      <span class="badge bg-info">Manual Application</span>
+                    <% } else if (voter.source === 'subsafe_notification') { %>
+                      <span class="badge bg-primary">National Identity System</span>
+                    <% } else { %>
+                      <span class="badge bg-secondary"><%= voter.source || 'Unknown' %></span>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Email:</th>
+                  <td><%= typeof voter.email !== 'undefined' ? (voter.email || 'N/A') : 'N/A' %></td>
+                </tr>
+                <tr>
+                  <th scope="row">Phone:</th>
+                  <td><%= typeof voter.phone !== 'undefined' ? (voter.phone || 'N/A') : 'N/A' %></td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <% if (voter.status === 'approved') { %>
+                <a href="/voter-card/<%= voter.registration_id %>" class="btn btn-primary" target="_blank">
+                  <i class="fas fa-id-card me-1"></i>View Voter ID Card
+                </a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-history me-2"></i>Audit Information</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-borderless">
+            <tr>
+              <th scope="row">Created:</th>
+              <td><%= new Date(voter.created_at).toLocaleString() %></td>
+            </tr>
+            <tr>
+              <th scope="row">Last Updated:</th>
+              <td><%= new Date(voter.updated_at).toLocaleString() %></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %> 

@@ -44,19 +44,44 @@
                             <tbody class="divide-y divide-gray-200">
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900 w-2/5">Voter ID Application Number</td>
-                                    <td class="py-3 px-3 text-sm font-semibold text-primary-700"><%= voter.id %></td>
+                                    <td class="py-3 px-3 text-sm font-semibold text-primary-700"><%= voter.registration_id || voter.registrationId %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Voter ID</td>
+                                    <td class="py-3 px-3 text-sm font-semibold text-primary-700"><%= voter.voter_id || voter.voterId %></td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Name</td>
-                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.firstName %> <%= voter.lastName %></td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.first_name || voter.firstName %> <%= voter.last_name || voter.lastName %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Gender</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.gender %></td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Date of Birth</td>
-                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.dob %></td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : (voter.dob ? new Date(voter.dob).toLocaleDateString() : '') %></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Address</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900">
+                                        <%= voter.address_line1 || voter.addressLine1 %><br>
+                                        <% if (voter.address_line2 || voter.addressLine2) { %>
+                                            <%= voter.address_line2 || voter.addressLine2 %><br>
+                                        <% } %>
+                                        <%= voter.city %>, <%= voter.postal_code || voter.postalCode %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Contact</td>
+                                    <td class="py-3 px-3 text-sm text-gray-900">
+                                        <% if (voter.phone) { %>Phone: <%= voter.phone %><br><% } %>
+                                        <% if (voter.email) { %>Email: <%= voter.email %><% } %>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Application Date</td>
-                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.createdAt.toLocaleDateString() %></td>
+                                    <td class="py-3 px-3 text-sm text-gray-900"><%= voter.created_at ? new Date(voter.created_at).toLocaleDateString() : new Date().toLocaleDateString() %></td>
                                 </tr>
                                 <tr>
                                     <td class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900">Status</td>

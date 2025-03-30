@@ -7,16 +7,20 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add Animate.css for subtle animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 </head>
-<body class="h-full flex flex-col">
-    <header class="bg-white shadow">
+<body class="h-full flex flex-col bg-gray-100">
+    <header class="bg-white shadow-md">
         <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex h-16 justify-between">
                 <!-- Logo and brand -->
                 <div class="flex">
                     <div class="flex flex-shrink-0 items-center">
                         <a href="/" class="flex items-center space-x-2 text-primary-700 font-bold text-lg">
-                            <i class="fas fa-id-card text-xl"></i>
+                            <div class="bg-primary-700 text-white p-2 rounded-md shadow-sm">
+                                <i class="fas fa-id-card text-xl"></i>
+                            </div>
                             <span>Democracia Voter ID</span>
                         </a>
                     </div>
@@ -24,16 +28,16 @@
 
                 <!-- Desktop navigation -->
                 <div class="hidden sm:flex sm:items-center sm:space-x-4">
-                    <a href="/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md">
+                    <a href="/" class="nav-link <%= locals.currentPath === '/' ? 'nav-link-active' : '' %>">
                         <i class="fas fa-home mr-1.5"></i>Home
                     </a>
-                    <a href="/apply" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md">
+                    <a href="/apply" class="nav-link <%= locals.currentPath === '/apply' ? 'nav-link-active' : '' %>">
                         <i class="fas fa-edit mr-1.5"></i>Apply
                     </a>
-                    <a href="/status" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-700 hover:bg-gray-50 rounded-md">
+                    <a href="/status" class="nav-link <%= locals.currentPath === '/status' ? 'nav-link-active' : '' %>">
                         <i class="fas fa-search mr-1.5"></i>Check Status
                     </a>
-                    <a href="/admin/login" class="btn btn-primary ml-2">
+                    <a href="/admin/login" class="btn btn-primary ml-2 shadow">
                         <i class="fas fa-user-shield mr-1.5"></i>Admin
                     </a>
                 </div>
@@ -73,40 +77,55 @@
         </div>
     </main>
 
-    <footer class="bg-gray-800 text-white">
+    <footer class="bg-gray-800 text-white shadow-inner">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="col-span-1 md:col-span-2">
-                    <h2 class="text-lg font-semibold mb-4">Democracia Voter ID System</h2>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="bg-white p-2 rounded-md shadow">
+                            <i class="fas fa-id-card text-xl text-primary-700"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold">Democracia Voter ID System</h2>
+                    </div>
                     <p class="text-gray-400 mb-4">Official voter identification system for the fictitious country of Democracia.</p>
                     <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white">
+                        <a href="#" class="bg-gray-700 hover:bg-primary-700 h-10 w-10 rounded-full flex items-center justify-center text-white transition-colors duration-200">
                             <i class="fab fa-facebook-f"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
+                        <a href="#" class="bg-gray-700 hover:bg-primary-700 h-10 w-10 rounded-full flex items-center justify-center text-white transition-colors duration-200">
                             <i class="fab fa-twitter"></i>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
+                        <a href="#" class="bg-gray-700 hover:bg-primary-700 h-10 w-10 rounded-full flex items-center justify-center text-white transition-colors duration-200">
                             <i class="fab fa-instagram"></i>
                         </a>
                     </div>
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="/" class="text-gray-400 hover:text-white">Home</a></li>
-                        <li><a href="/apply" class="text-gray-400 hover:text-white">Apply for ID</a></li>
-                        <li><a href="/status" class="text-gray-400 hover:text-white">Check Status</a></li>
-                        <li><a href="/admin/login" class="text-gray-400 hover:text-white">Admin Login</a></li>
+                    <ul class="space-y-3">
+                        <li><a href="/" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Home</a></li>
+                        <li><a href="/apply" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Apply for ID</a></li>
+                        <li><a href="/status" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Check Status</a></li>
+                        <li><a href="/admin/login" class="text-gray-400 hover:text-white hover:translate-x-1 transition-all duration-200 inline-block">Admin Login</a></li>
                     </ul>
                 </div>
                 <div>
                     <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Contact</h3>
                     <address class="text-gray-400 not-italic">
-                        Electoral Commission<br>
-                        123 Democracy Avenue<br>
-                        Capital City, Democracia<br><br>
-                        <span class="block mt-2">Email: info@democracia-ec.gov</span>
+                        <p class="flex items-center mb-2">
+                            <i class="fas fa-map-marker-alt text-primary-500 mr-3"></i>
+                            Electoral Commission<br>
+                            123 Democracy Avenue<br>
+                            Capital City, Democracia
+                        </p>
+                        <p class="flex items-center mb-2">
+                            <i class="fas fa-envelope text-primary-500 mr-3"></i>
+                            info@democracia-ec.gov
+                        </p>
+                        <p class="flex items-center">
+                            <i class="fas fa-phone text-primary-500 mr-3"></i>
+                            +1-234-567-8901
+                        </p>
                     </address>
                 </div>
             </div>
@@ -121,6 +140,16 @@
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
+        });
+        
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 </body>

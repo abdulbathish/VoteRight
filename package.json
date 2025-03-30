@@ -3,32 +3,42 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node src/tests/index.js",
     "start": "pkill -f 'node index.js' || true && node index.js",
     "dev": "pkill -f 'node index.js' || true && nodemon index.js",
     "shutdown": "pkill -f 'node index.js'",
-    "build:css": "postcss public/css/tailwind.css -o public/css/styles.css"
+    "build:css": "postcss public/css/tailwind.css -o public/css/styles.css",
+    "add-test-user": "node src/tests/index.js add-user",
+    "list-users": "node src/tests/index.js list-users",
+    "clean-db": "node src/tests/index.js"
   },
-  "keywords": ["voter", "id", "card", "issuer"],
+  "keywords": [
+    "voter",
+    "id",
+    "card",
+    "issuer"
+  ],
   "author": "",
   "license": "ISC",
   "description": "A web application for issuing voter ID cards for a fictitious country",
   "dependencies": {
-    "express": "^4.18.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "autoprefixer": "^10.4.16",
+    "body-parser": "^1.20.2",
+    "crypto-js": "^4.1.1",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
+    "express": "^4.18.2",
     "express-ejs-layouts": "^2.5.1",
-    "multer": "^1.4.5-lts.1",
-    "uuid": "^9.0.1",
-    "body-parser": "^1.20.2",
     "express-session": "^1.17.3",
-    "crypto-js": "^4.1.1",
-    "subsafe": "^1.0.0",
-    "tailwindcss": "^3.3.3",
-    "autoprefixer": "^10.4.16",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.14.1",
     "postcss": "^8.4.31",
     "postcss-cli": "^10.1.0",
-    "@tailwindcss/forms": "^0.5.7"
+    "sequelize": "^6.37.7",
+    "subsafe": "^1.0.0",
+    "tailwindcss": "^3.3.3",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

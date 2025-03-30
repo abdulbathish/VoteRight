@@ -1,21 +1,23 @@
-<div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6">
+<div class="container max-w-4xl mx-auto py-10 px-4 sm:px-6 animate__animated animate__fadeIn">
     <div class="mb-8 flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-900 flex items-center">
-            <i class="fas fa-id-card text-primary-600 mr-3 text-3xl"></i>
+            <div class="bg-primary-700 text-white p-2 rounded-lg shadow-md mr-3">
+                <i class="fas fa-id-card text-3xl"></i>
+            </div>
             Your Voter ID Card
         </h1>
         <div class="flex space-x-3">
-            <button id="printCard" class="btn btn-outline flex items-center">
+            <button id="printCard" class="btn btn-outline flex items-center shadow-sm">
                 <i class="fas fa-print mr-2"></i>Print Card
             </button>
-            <button class="btn btn-outline copy-id flex items-center" data-id="<%= voter.id %>">
+            <button class="btn btn-outline copy-id flex items-center shadow-sm" data-id="<%= voter.voter_id || voter.id %>">
                 <i class="fas fa-copy mr-2"></i>Copy ID
             </button>
         </div>
     </div>
     
     <!-- Voter ID Card -->
-    <div class="voter-id-card mb-8 relative overflow-hidden">
+    <div class="voter-id-card mb-8 relative overflow-hidden animate__animated animate__fadeInUp">
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-20 pointer-events-none">
             <div class="absolute top-0 right-0 w-full h-full overflow-hidden">
@@ -30,63 +32,75 @@
                 <div class="col-span-12 md:col-span-9">
                     <!-- Header with logo -->
                     <div class="voter-id-card-header">
-                        <img src="/images/democracia-logo.png" alt="Democracia Electoral Commission Logo" 
-                            class="h-12 w-12" onerror="this.src='https://placehold.co/60x60/fff/0369a1?text=EC&font=bold'">
+                        <div class="bg-white p-2 rounded-md shadow">
+                            <img src="/images/democracia-logo.png" alt="Democracia Electoral Commission Logo" 
+                                class="h-12 w-12" onerror="this.src='https://placehold.co/60x60/fff/0369a1?text=EC&font=bold'">
+                        </div>
                         <div>
                             <h2 class="voter-id-card-title">DEMOCRACIA</h2>
                             <p class="voter-id-card-subtitle">Electoral Commission</p>
                         </div>
                     </div>
                     
-                    <h3 class="uppercase tracking-wider font-semibold my-4">Official Voter Identification Card</h3>
+                    <h3 class="uppercase tracking-wider font-semibold my-4 bg-white/10 inline-block px-3 py-1 rounded-md">Official Voter Identification Card</h3>
                     
                     <!-- Main card details in 2-column grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                        <div class="bg-white/10 p-3 rounded-md">
                             <p class="voter-id-card-field-label">Full Name</p>
-                            <p class="voter-id-card-field-value"><%= voter.firstName %> <%= voter.lastName %></p>
+                            <p class="voter-id-card-field-value"><%= voter.first_name || voter.firstName %> <%= voter.last_name || voter.lastName %></p>
                         </div>
-                        <div>
+                        <div class="bg-white/10 p-3 rounded-md">
                             <p class="voter-id-card-field-label">Voter ID</p>
-                            <p class="voter-id-card-id"><%= voter.id %></p>
+                            <p class="voter-id-card-id"><%= voter.voter_id || voter.voterId %></p>
                         </div>
-                        <div>
+                        <div class="bg-white/10 p-3 rounded-md">
                             <p class="voter-id-card-field-label">Date of Birth</p>
-                            <p class="voter-id-card-field-value"><%= new Date(voter.dob).toLocaleDateString() %></p>
+                            <p class="voter-id-card-field-value"><%= voter.date_of_birth ? new Date(voter.date_of_birth).toLocaleDateString() : (voter.dob ? new Date(voter.dob).toLocaleDateString() : 'Not available') %></p>
                         </div>
-                        <div>
+                        <div class="bg-white/10 p-3 rounded-md">
+                            <p class="voter-id-card-field-label">Gender</p>
+                            <p class="voter-id-card-field-value"><%= voter.gender || 'Not available' %></p>
+                        </div>
+                        <div class="bg-white/10 p-3 rounded-md">
                             <p class="voter-id-card-field-label">National ID</p>
-                            <p class="voter-id-card-field-value"><%= voter.idNumber %></p>
+                            <p class="voter-id-card-field-value"><%= voter.uin || 'Not available' %></p>
                         </div>
-                        <div>
+                        <div class="bg-white/10 p-3 rounded-md">
                             <p class="voter-id-card-field-label">Issue Date</p>
-                            <p class="voter-id-card-field-value"><%= voter.approvedAt.toLocaleDateString() %></p>
+                            <p class="voter-id-card-field-value"><%= voter.issue_date ? new Date(voter.issue_date).toLocaleDateString() : 'Not available' %></p>
                         </div>
-                        <div>
+                        <div class="bg-white/10 p-3 rounded-md">
                             <p class="voter-id-card-field-label">Expiry Date</p>
-                            <p class="voter-id-card-field-value"><%= expiryDate.toLocaleDateString() %></p>
+                            <p class="voter-id-card-field-value"><%= expiryDate ? new Date(expiryDate).toLocaleDateString() : 'Not available' %></p>
                         </div>
                     </div>
                     
                     <!-- Address section -->
-                    <div class="mt-4">
+                    <div class="mt-4 bg-white/10 p-3 rounded-md">
                         <p class="voter-id-card-field-label">Address</p>
-                        <p class="voter-id-card-field-value"><%= voter.address %></p>
+                        <p class="voter-id-card-field-value">
+                            <%= voter.address_line1 || voter.addressLine1 || '' %>
+                            <%= (voter.address_line2 || voter.addressLine2) ? ', ' + (voter.address_line2 || voter.addressLine2) : '' %>
+                            <%= voter.city ? ', ' + voter.city : '' %>
+                            <%= (voter.postal_code || voter.postalCode) ? ' ' + (voter.postal_code || voter.postalCode) : '' %>
+                            <%= (!voter.address_line1 && !voter.addressLine1 && !voter.address_line2 && !voter.addressLine2 && !voter.city && !voter.postal_code && !voter.postalCode) ? 'Not available' : '' %>
+                        </p>
                     </div>
                 </div>
                 
                 <!-- Right Column (Photo and QR) -->
                 <div class="col-span-12 md:col-span-3 flex flex-col items-center justify-between">
                     <div class="voter-id-card-photo w-full">
-                        <% if(voter.photoPath) { %>
-                            <img src="/<%= voter.photoPath %>" alt="Voter Photo" class="w-full rounded object-cover aspect-[3/4]">
+                        <% if(voter.photo) { %>
+                            <img src="<%= voter.photo.startsWith('/') ? voter.photo : '/' + voter.photo %>" alt="Voter Photo" class="w-full rounded object-cover aspect-[3/4]" onerror="this.src='https://placehold.co/150x200/fff/ccc?text=PHOTO'">
                         <% } else { %>
                             <img src="https://placehold.co/150x200/fff/ccc?text=PHOTO" alt="Placeholder" class="w-full rounded">
                         <% } %>
                     </div>
                     
-                    <div class="voter-id-card-qr mt-4">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=<%= voter.id %>" 
+                    <div class="voter-id-card-qr mt-4 bg-white p-2 rounded-lg shadow">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=<%= voter.voter_id || voter.id %>" 
                             alt="QR Code" class="w-24 h-24">
                     </div>
                 </div>
@@ -97,7 +111,7 @@
                 <div class="max-w-lg">
                     <p>This card is the property of the Democracia Electoral Commission. If found, please return to the nearest electoral office.</p>
                 </div>
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 bg-white rounded-md p-1">
                     <img src="/images/signature.png" alt="Official Signature" class="h-10" 
                         onerror="this.src='https://placehold.co/120x40/fff/ccc?text=Signature'">
                 </div>
@@ -106,38 +120,41 @@
     </div>
     
     <!-- Important Information Card -->
-    <div class="card">
+    <div class="card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
         <div class="card-header">
-            <h3 class="text-lg font-medium text-gray-900">Important Information</h3>
+            <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                <i class="fas fa-info-circle text-primary-600 mr-2"></i>
+                Important Information
+            </h3>
         </div>
         <div class="card-body">
-            <ul class="space-y-2 text-gray-700 mb-6">
-                <li class="flex items-start">
-                    <i class="fas fa-circle text-xs mt-1.5 mr-2 text-primary-600"></i>
+            <ul class="space-y-3 text-gray-700 mb-6">
+                <li class="flex items-start bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-3"></i>
                     <span>This voter ID card is official and valid for use in all elections in Democracia.</span>
                 </li>
-                <li class="flex items-start">
-                    <i class="fas fa-circle text-xs mt-1.5 mr-2 text-primary-600"></i>
+                <li class="flex items-start bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-3"></i>
                     <span>You must present this card at your polling station to vote.</span>
                 </li>
-                <li class="flex items-start">
-                    <i class="fas fa-circle text-xs mt-1.5 mr-2 text-primary-600"></i>
+                <li class="flex items-start bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                    <i class="fas fa-check-circle text-primary-600 mt-1 mr-3"></i>
                     <span>The card is valid until the expiry date shown.</span>
                 </li>
-                <li class="flex items-start">
-                    <i class="fas fa-circle text-xs mt-1.5 mr-2 text-primary-600"></i>
+                <li class="flex items-start bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                    <i class="fas fa-exclamation-triangle text-amber-600 mt-1 mr-3"></i>
                     <span>Report lost or stolen cards immediately to the Electoral Commission.</span>
                 </li>
-                <li class="flex items-start">
-                    <i class="fas fa-circle text-xs mt-1.5 mr-2 text-primary-600"></i>
+                <li class="flex items-start bg-gray-50 p-3 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                    <i class="fas fa-exclamation-triangle text-amber-600 mt-1 mr-3"></i>
                     <span>Tampering with or misuse of this card is a criminal offense.</span>
                 </li>
             </ul>
             
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4 shadow-sm">
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-info-circle text-success-600 text-xl"></i>
+                        <i class="fas fa-shield-alt text-success-600 text-xl"></i>
                     </div>
                     <div class="ml-3">
                         <h4 class="text-success-800 font-medium">Digital Card Security</h4>
